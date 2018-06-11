@@ -1,0 +1,4 @@
+hostname    ip              user    password        intro 
+
+solar       104.128.226.70  root    **0x0112358D    openvpn server
+eco         49.4.2.233      root    Handhand300170  eco server
