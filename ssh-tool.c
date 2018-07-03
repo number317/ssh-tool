@@ -1,12 +1,9 @@
 # include<stdio.h>
 # include<stdlib.h>
 # include<string.h>
-# include <yaml.h>
-# include<sys/types.h>
-# include<signal.h>
 # include<ncurses.h>
 
-#define MAXROW 1000
+#define MAXROW 500
 #define MAXCOL 500
 
 WINDOW *scrn;
@@ -15,21 +12,23 @@ typedef struct {
     char *groupname;
     char *hostname;
     char *ip;
+    int port;
     char *username;
     char *password;
     char *intro;
 }host;
 
-const host temp1={"all", "solar", "104.128.226.70", "root", "**0x0112358D", "openvpn server"};
-const host temp2={"all", "eco", "49.4.2.233", "root", "Handhand300170", "eco server"};
-
-host all[]={temp1,temp2};
+typedef struct {
+    int len;
+    host hosts[MAXROW];
+}hostList;
 
 char cmdoutlines[MAXROW][MAXCOL];
 
+hostList hl;
+
 int ncmdlines,
     nwinlines,
-
     winrow,
     cmdstartrow,
     cmdlastrow;
@@ -43,7 +42,7 @@ void reverse(){
     refresh();
 }
 
-void runpsax(){
+void getConf(){
     FILE *p;
     char ln[MAXCOL];
     int row;
@@ -88,27 +87,55 @@ void updown(int inc){
     }
 }
 
-void rerun(){
-    runpsax();
+void reload(){
+    getConf();
     showlastpart();
 }
 
 void connect(){
     refresh();
     endwin();
-    char *temp[] = {"sshpass -p ", temp2.password, " ssh ", temp2.username, "@", temp2.ip};
+    char *password, *username, *ip, *port, *hostname;
+    char *str=cmdoutlines[cmdstartrow+winrow];
+    char *list=NULL;
+    int i=0;
+    list=strtok(str," ");
+    hostname=list;
+    while(list != NULL){
+        switch(i){
+            case 0:
+                list=strtok(NULL, " ");
+                ip=list;
+                break;
+            case 1:
+                list=strtok(NULL, " ");
+                port=list;
+                break;
+            case 2:
+                list=strtok(NULL, " ");
+                username=list;
+                break;
+            case 3:
+                list=strtok(NULL, " ");
+                password=list;
+                break;
+            default:
+                list=strtok(NULL, " ");
+        }
+        i++;
+    }
+    char *temp[] = {"sshpass -p ", password, " ssh ", username, "@", ip, " -p ", port};
     char *result;
     result = (char *)malloc(100*sizeof(char));
     result[0]='\0';
-    int i;
-    for(i=0; i<6; i++){
+    for(i=0; i<8; i++){
         strcat(result, temp[i]);
     }
-    printf("connect to %s...\n", temp1.hostname);
-    printf("%s\n", result);
+    /** printf("%s\n", result); */
+    printf("connect to %s...\n", hostname);
     system(result);
     free(result);
-    rerun();
+    reload();
 }
 
 int main(){
@@ -116,7 +143,7 @@ int main(){
     scrn = initscr();
     noecho();
     cbreak();
-    runpsax();
+    getConf();
     showlastpart();
     while (c != 'q') {
         c = getchar();
@@ -128,10 +155,9 @@ int main(){
                 updown(1);
                 break;
             case 'r':
-                rerun();
+                reload();
                 break;
             case '\r':
-                /** prockill(); */
                 connect();
                 break;
             case 'q':

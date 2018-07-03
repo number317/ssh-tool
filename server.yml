@@ -7,10 +7,8 @@ group:
         user: "root"
         password: "**0x0112358D"
         intro: "openvpn server"
-    hosts:
       - hostname: "eco"
         ip: "49.4.2.233"
         user: "root"
         password: "Handhand300170"
         intro: "eco server"
-

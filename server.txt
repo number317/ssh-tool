@@ -1,5 +1,8 @@
-hostname    ip              user    password        intro 
+hostname        ip              port        user            password            intro 
 
-solar       104.128.226.70  root    **0x0112358D    openvpn server
-eco         49.4.2.233      root    Handhand300170  eco server
-test        10.0.21.67      appuser Hello0908@2019  ahg
+idc-dev         10.0.52.184     22          appuser         Hello@05092018      idc dev & uat env
+idc-proxy       10.0.6.44       22          appuser         Hello0430@2018      idc prod proxy
+aliyun-k8s      10.79.17.18     60022       18711686385     Sweet1182618926@    aliyun k8s
+aliyun-test     10.79.21.23     22          root            Hello123@0908       aliyun test 
+eco             49.4.2.233      22          root            Handhand300170      eco server
+solar           104.128.226.70  22          root            **0x0112358D        openvpn server
