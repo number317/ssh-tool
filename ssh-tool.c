@@ -8,30 +8,54 @@
 
 WINDOW *scrn;
 
-typedef struct {
-    char *groupname;
-    char *hostname;
-    char *ip;
-    int port;
-    char *username;
-    char *password;
-    char *intro;
-}host;
-
-typedef struct {
-    int len;
-    host hosts[MAXROW];
-}hostList;
-
 char cmdoutlines[MAXROW][MAXCOL];
-
-hostList hl;
 
 int ncmdlines,
     nwinlines,
     winrow,
     cmdstartrow,
     cmdlastrow;
+
+void reverse();
+void getConf();
+void getConf();
+void showlastpart();
+void updown();
+void reload();
+void connect();
+
+int main(){
+    char c;
+    scrn = initscr();
+    noecho();
+    cbreak();
+    getConf();
+    showlastpart();
+    while (c != 'q') {
+        c = getchar();
+        switch(c){
+            case 'k':
+                updown(-1);
+                break;
+            case 'j':
+                updown(1);
+                break;
+            case 'r':
+                reload();
+                break;
+            case '\r':
+                connect();
+                reload();
+                break;
+            case 'q':
+                break;
+            default:
+                ;
+        }
+    }
+    endwin();
+    return 0;
+}
 
 void reverse(){
     int clinenum;
@@ -46,7 +70,14 @@ void getConf(){
     FILE *p;
     char ln[MAXCOL];
     int row;
-    p = fopen("./server.txt", "r");
+    char *resource=(char*)malloc(sizeof(char)*50);
+    resource=getenv("HOME");
+    p = fopen(strcat(resource,"/.config/ssh-tool/server.txt"), "r");
+    if(p==NULL){
+        printf("Resource file %s dose't exists!\n", resource);
+        endwin();
+        exit(0);
+    }
     for (row = 0; row < MAXROW; row++){
         if(fgets(ln, MAXCOL, p) != NULL){
             strncpy(cmdoutlines[row], ln, COLS);
@@ -89,6 +120,7 @@ void updown(int inc){
 
 void reload(){
     getConf();
+    refresh();
     showlastpart();
 }
 
@@ -131,41 +163,7 @@ void connect(){
     for(i=0; i<8; i++){
         strcat(result, temp[i]);
     }
-    /** printf("%s\n", result); */
     printf("connect to %s...\n", hostname);
     system(result);
-    free(result);
-    reload();
 }
 
-int main(){
-    char c;
-    scrn = initscr();
-    noecho();
-    cbreak();
-    getConf();
-    showlastpart();
-    while (c != 'q') {
-        c = getchar();
-        switch(c){
-            case 'k':
-                updown(-1);
-                break;
-            case 'j':
-                updown(1);
-                break;
-            case 'r':
-                reload();
-                break;
-            case '\r':
-                connect();
-                break;
-            case 'q':
-                break;
-            default:
-                ;
-        }
-    }
-    endwin();
-    return 0;
-}
