@@ -156,7 +156,11 @@ void connect(){
         }
         i++;
     }
-    char *temp[] = {"sshpass -p ", password, " ssh ", username, "@", ip, " -p ", port};
+    char *temp[] = {"sshpass -p ", 
+    password, " ssh ",
+    username, "@", ip,
+    " -p ",
+    port};
     char *result;
     result = (char *)malloc(100*sizeof(char));
     result[0]='\0';
