@@ -19,8 +19,3 @@ void printHost(host* host){
         printf("{group:%s, hostname:%s, ip:%s, port:%s, user:%s, password:%s, intro:%s}\n",
                 host->group, host->hostname, host->ip, host->port, host->user, host->password, host->intro);
 }
-
-void clearHost(host* host){
-    printf("%s\n", host->group);
-    free(host);
-}
