@@ -1,7 +1,7 @@
-# include<stdio.h>
-# include<stdlib.h>
-# include<string.h>
-# include<ncurses.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ncurses.h>
 
 #define MAXROW 500
 #define MAXCOL 500
@@ -61,7 +61,7 @@ void reverse(){
     int clinenum;
     attron(A_REVERSE);
     clinenum = cmdstartrow + winrow;
-    mvaddstr(winrow, 0, cmdoutlines[clinenum]);
+    mvaddnstr(winrow, 0, cmdoutlines[clinenum], strlen(cmdoutlines[clinenum])-2);
     attroff(A_REVERSE);
     refresh();
 }
@@ -71,7 +71,7 @@ void getConf(){
     char ln[MAXCOL];
     int row;
     char *resource=(char*)malloc(sizeof(char)*50);
-    resource=getenv("HOME");
+    resource=strcpy(resource, getenv("HOME"));
     p = fopen(strcat(resource,"/.config/ssh-tool/server.txt"), "r");
     if(p==NULL){
         printf("Resource file %s dose't exists!\n", resource);
@@ -103,7 +103,7 @@ void showlastpart(){
     for (row = cmdstartrow, winrow = 0; row <= cmdlastrow; row++, winrow++)
         mvaddstr(winrow, 0, cmdoutlines[row]);
     refresh();
-    winrow--;
+    winrow=2;
     reverse();
 }
 
@@ -160,7 +160,7 @@ void connect(){
         "sshpass -p ",
         password,
         " ssh ",
-        username, 
+        username,
         "@",
         ip,
         " -p ",

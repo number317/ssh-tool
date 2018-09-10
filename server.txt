@@ -3,6 +3,10 @@ hostname        ip              port        user            password            
 idc-dev         10.0.52.184     22          appuser         Hello@05092018      idc dev & uat env
 idc-proxy       10.0.6.44       22          appuser         Hello0430@2018      idc prod proxy
 aliyun-k8s      10.79.17.18     60022       18711686385     Sweet1182618926@    aliyun k8s
+tencent-k8s     10.107.48.2     10022       appuser         Qa4Zqwe21w2Gey      tencent k8s
 aliyun-test     10.79.21.23     22          root            Hello123@0908       aliyun test 
 eco             49.4.2.233      22          root            Handhand300170      eco server
 solar           104.128.226.70  22          root            **0x0112358D        openvpn server
+my-ali-node1    47.96.236.0     22          root            **0x0112358D        aliyun choreodon
+my-ali-node2    47.99.38.4      22          root            **0x0112358D        aliyun choreodon
+my-ali-node3    47.98.138.170   22          root            **0x0112358D        aliyun choreodon

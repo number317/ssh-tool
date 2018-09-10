@@ -2,3 +2,5 @@
 *.iml
 *.out
 nbproject/
+ssh-tool
+main
