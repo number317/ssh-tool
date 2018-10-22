@@ -17,6 +17,24 @@ so that you don't need to remember the servers' ip, password or port.
 * G: move to last
 * \r: connect
 
+# config
+
+The config file is in `$HOME/.config/ssh-tool/server.txt`, there is no way to change the position now unless edit the source file.
+
+config template:
+
+```txt
+hostname        ip              port        user            password            intro 
+
+test-server1    10.10.10.10     22          root            helloworld          test server
+test-server2    10.10.10.11     22          root            helloworld          test server
+test-server3    10.10.10.12     22          root            helloworld          test server
+test-server4    10.10.10.13     22          root            helloworld          test server
+test-server5    10.10.10.14     22          root            helloworld          test server
+```
+
+The config file should have `hostname`, `ip`, `port`, `user`, `password`, `intro` six part.
+
 # screenshot
 
-
+![screenshot](./img/screenshot.png)
