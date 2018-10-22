@@ -1,6 +1,6 @@
 cc = gcc
-target = main
-source = main.c node.h host.h node.c host.c
+target = ssh-tool
+source = ssh-tool.c
 
 $(target): $(source)
 	$(cc) -o $(target) -Wall -std=c11 $(source) -lncurses

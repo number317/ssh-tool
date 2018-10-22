@@ -47,6 +47,10 @@ int main(){
                 connect();
                 reload();
                 break;
+            case 'G':
+                for(int i=0; i<cmdlastrow; i++)
+                    updown(1);
+                break;
             case 'q':
                 break;
             default:
@@ -175,4 +179,3 @@ void connect(){
     printf("connect to %s...\n", hostname);
     system(result);
 }
-
