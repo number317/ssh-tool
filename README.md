@@ -11,7 +11,7 @@ This is a small tool to manage ssh server info in command line. Write down the s
 
 * <kbd>j</kbd>: move down
 * <kbd>k</kbd>: move up
-* <kbd>r></kbd>: reload
+* <kbd>r</kbd>: reload
 * <kbd>q</kbd>: exit
 * <kbd>G</kbd>: move to last
 * <kbd>Enter</kbd>: connect
