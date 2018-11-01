@@ -1,7 +1,6 @@
 # Intro
 
-This is a small tool to manage ssh server info in command line. Write the serve
-so that you don't need to remember the servers' ip, password or port.
+This is a small tool to manage ssh server info in command line. Write down the servers' info in the config file so that you don't need to remember the servers' ip, password or port.
 
 # Dependency
 
@@ -10,12 +9,12 @@ so that you don't need to remember the servers' ip, password or port.
 
 # shortcut
 
-* j: move down
-* k: move up
-* r: reload
-* q: exit
-* G: move to last
-* \r: connect
+* <kbd>j</kbd>: move down
+* <kbd>k</kbd>: move up
+* <kbd>r></kbd>: reload
+* <kbd>q</kbd>: exit
+* <kbd>G</kbd>: move to last
+* <kbd>Enter</kbd>: connect
 
 # config
 
