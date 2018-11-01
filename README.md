@@ -8,7 +8,7 @@ so that you don't need to remember the servers' ip, password or port.
 * ncurse: draw gui
 * sshpass: take password form config file
 
-# usage
+# shortcut
 
 * j: move down
 * k: move up
