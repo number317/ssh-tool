@@ -6,9 +6,11 @@ This is a small tool to manage ssh server info in command line. Write down the s
 
 * ncurse: draw gui
 * sshpass: take password form config file
+* vim: edit config file
 
 # shortcut
 
+* <kbd>e</kbd>: edit config with vim
 * <kbd>j</kbd>: move down
 * <kbd>k</kbd>: move up
 * <kbd>r</kbd>: reload
