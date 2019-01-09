@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #include <ncurses.h>
 
-#define MAXROW 500
-#define MAXCOL 500
+#define MAXROW BUFSIZ
+#define MAXCOL BUFSIZ
 
 WINDOW *scrn;
 
@@ -26,6 +27,7 @@ void connect();
 
 int main(){
     char c;
+    setlocale(LC_ALL,"");
     scrn = initscr();
     noecho();
     cbreak();
@@ -41,6 +43,10 @@ int main(){
                 updown(1);
                 break;
             case 'r':
+                reload();
+                break;
+            case 'e':
+                system("vim ~/.config/ssh-tool/server.txt");
                 reload();
                 break;
             case '\r':
@@ -129,7 +135,6 @@ void reload(){
 }
 
 void connect(){
-    refresh();
     endwin();
     char *password, *username, *ip, *port, *hostname;
     char *str=cmdoutlines[cmdstartrow+winrow];
@@ -160,22 +165,8 @@ void connect(){
         }
         i++;
     }
-    char *temp[] = {
-        "sshpass -p ",
-        password,
-        " ssh ",
-        username,
-        "@",
-        ip,
-        " -p ",
-        port
-    };
-    char *result;
-    result = (char *)malloc(100*sizeof(char));
-    result[0]='\0';
-    for(i=0; i<8; i++){
-        strcat(result, temp[i]);
-    }
+    char *result=malloc(100*sizeof(char));
+    sprintf(result, "sshpass -p %s ssh %s@%s -p %s", password, username, ip, port);
     printf("connect to %s...\n", hostname);
     system(result);
 }
