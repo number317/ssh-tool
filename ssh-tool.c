@@ -90,7 +90,7 @@ void getConf(){
     }
     for (row = 0; row < MAXROW; row++){
         if(fgets(ln, MAXCOL, p) != NULL){
-            strncpy(cmdoutlines[row], ln, COLS);
+            strncpy(cmdoutlines[row], ln, strlen(ln));
             cmdoutlines[row][MAXCOL-1] = 0;
         } else break;
     }
