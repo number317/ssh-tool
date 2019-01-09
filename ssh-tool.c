@@ -46,10 +46,12 @@ int main(){
                 reload();
                 break;
             case 'e':
+                endwin();
                 system("vim ~/.config/ssh-tool/server.txt");
                 reload();
                 break;
             case '\r':
+                endwin();
                 connect();
                 reload();
                 break;
