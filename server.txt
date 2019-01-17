@@ -1,7 +1,0 @@
-hostname        ip              port        user            password            intro 
-
-test-server1    10.10.10.10     22          root            helloworld          test server
-test-server2    10.10.10.11     22          root            helloworld          test server
-test-server3    10.10.10.12     22          root            helloworld          test server
-test-server4    10.10.10.13     22          root            helloworld          test server
-test-server5    10.10.10.14     22          root            helloworld          test server

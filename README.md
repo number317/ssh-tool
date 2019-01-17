@@ -4,38 +4,55 @@ This is a small tool to manage ssh server info in command line. Write down the s
 
 # Dependency
 
+* libconfig: parse cfg
 * ncurse: draw gui
 * sshpass: take password form config file
-* vim: edit config file
 
 # shortcut
 
-* <kbd>e</kbd>: edit config with vim
+* <kbd>e</kbd>: edit config with `$EDITOR`
 * <kbd>j</kbd>: move down
 * <kbd>k</kbd>: move up
 * <kbd>r</kbd>: reload
+* <kbd>s</kdb>: toggle password
 * <kbd>q</kbd>: exit
 * <kbd>G</kbd>: move to last
 * <kbd>Enter</kbd>: connect
 
 # config
 
-The config file is in `$HOME/.config/ssh-tool/server.txt`, there is no way to change the position now unless edit the source file.
+The default config file is in `$HOME/.config/ssh-tool/hosts.cfg`, you can also change the file path by `ssh-tool /path/to/config_file`.
 
 config template:
 
-```txt
-hostname        ip              port        user            password            intro 
-
-test-server1    10.10.10.10     22          root            helloworld          test server
-test-server2    10.10.10.11     22          root            helloworld          test server
-test-server3    10.10.10.12     22          root            helloworld          test server
-test-server4    10.10.10.13     22          root            helloworld          test server
-test-server5    10.10.10.14     22          root            helloworld          test server
+```cfg
+header=["hostname", "ip", "port", "username", "password", "intro"];
+seperation_char="━"
+seperation_length=90;
+hosts=(
+        {
+        hostname="test2";
+        ip="111.111.111.111";
+        port="22";
+        username="root";
+        password="admin";
+        comment="test1";
+        },
+        {
+        hostname="test2";
+        ip="222.222.222.222";
+        port="22";
+        username="root";
+        password="admin";
+        comment="test2";
+        }
+      );
 ```
 
 The config file should have `hostname`, `ip`, `port`, `user`, `password`, `intro` six part.
 
 # screenshot
 
-![screenshot](./img/screenshot.png)
+![hide](./img/hide.jpg)
+
+![show](./img/show.jpg)
