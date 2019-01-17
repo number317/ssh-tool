@@ -31,11 +31,14 @@ char* get_seperation(
     /*
      * make sure seperation has the enough space
      */
-    if(!realloc(seperation,seperation_length*(strlen(seperation_char)+1)))
-        printf("error\n");
+    int char_width = strlen(seperation_char);
+    if(!realloc(seperation,seperation_length*(char_width+1))) {
+        printf("error occur when realloc for seperation\n");
+        exit(1);
+    }
     memset(seperation, 0, seperation_length*(strlen(seperation_char)+1));
-    for(int i=0; i<seperation_length; i++)
-        strcat(seperation, seperation_char);
+    for(int i=0; i<seperation_length;i++)
+        sprintf(seperation+i*char_width, seperation_char);
     return seperation;
 }
 
