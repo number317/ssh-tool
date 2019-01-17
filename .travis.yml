@@ -4,6 +4,7 @@ branches:
   - master
 
 install:
+  - sudo apt update
   - sudo apt install --yes libncurses5-dev libconfig-dev
 
 script:
