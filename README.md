@@ -1,3 +1,5 @@
+![travisci](https://www.travis-ci.org/number317/ssh-tool.svg?branch=master)
+
 # Intro
 
 This is a small tool to manage ssh server info in command line. Write down the servers' info in the config file so that you don't need to remember the servers' ip, password or port.
