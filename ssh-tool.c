@@ -61,14 +61,13 @@ int main(int argc, char *argv[]){
         {
             case 'e':
                 endwin();
-                char *editor = (char*)calloc(10, sizeof(char));
-                if(!(editor = getenv("EDITOR"))) {
+                if(!getenv("EDITOR")) {
                     fprintf(stderr, "Your editor haven't been set!\n"
                             "3 seconds later will go back...\n");
                     sleep(3);
                 }
                 else {
-                    snprintf(command, 100, "%s %s", editor, config_file);
+                    snprintf(command, 100, "%s %s", getenv("EDITOR"), config_file);
                     system(command);
 
                     config_init(config);
@@ -94,7 +93,6 @@ int main(int argc, char *argv[]){
                     show_password=0;
                 }
                 show(header, seperation, hosts, hosts_length, current_row, show_password);
-                free(editor); editor=NULL;
                 break;
             case 'j':
                 current_row= current_row>=hosts_length-2 ? hosts_length-1 : current_row+1;
@@ -126,7 +124,8 @@ int main(int argc, char *argv[]){
                         );
                 hosts = (host**)calloc(hosts_length, sizeof(host*));
                 get_hosts(config, hosts, hosts_length);
-                current_row=0, show_password=0;
+                current_row=0;
+                show_password=0;
                 show(header, seperation, hosts, hosts_length, current_row, show_password);
                 break;
             case 's':
