@@ -38,7 +38,7 @@ char* get_seperation(
     }
     memset(seperation, 0, seperation_length*(strlen(seperation_char)+1));
     for(int i=0; i<seperation_length;i++)
-        sprintf(seperation+i*char_width, seperation_char);
+        snprintf(seperation+i*char_width, seperation_length, seperation_char);
     return seperation;
 }
 

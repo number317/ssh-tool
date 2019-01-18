@@ -17,11 +17,10 @@ int main(int argc, char *argv[]){
 
 /*{{{ init config */
     char *config_file = (char*)calloc(100, sizeof(char));
-    char *home = (char*)calloc(100, sizeof(char));
-    home = getenv("HOME");
-    strcpy(config_file, home);
-    config_file = argc != 2 ?
-        strcat(config_file, "/.config/ssh-tool/hosts.cfg") : argv[1];
+    if(argc!=2)
+        snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg", getenv("HOME"));
+    else
+        snprintf(config_file, 100, argv[1]);
     config_t *config = malloc(sizeof(config_t));
 
     config_init(config);
@@ -47,7 +46,8 @@ int main(int argc, char *argv[]){
             );
     host **hosts = (host**)calloc(hosts_length, sizeof(host*));
     get_hosts(config, hosts, hosts_length);
-    int current_row=0, show_password=0;
+    int current_row=0;
+    int show_password=0;
 /*}}}*/
 
     show(header, seperation, hosts, hosts_length, current_row, show_password);
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
                     sleep(3);
                 }
                 else {
-                    sprintf(command, "%s %s", editor, config_file);
+                    snprintf(command, 100, "%s %s", editor, config_file);
                     system(command);
 
                     config_init(config);
@@ -90,8 +90,11 @@ int main(int argc, char *argv[]){
                             );
                     hosts = (host**)calloc(hosts_length, sizeof(host*));
                     get_hosts(config, hosts, hosts_length);
+                    current_row=0;
+                    show_password=0;
                 }
                 show(header, seperation, hosts, hosts_length, current_row, show_password);
+                free(editor); editor=NULL;
                 break;
             case 'j':
                 current_row= current_row>=hosts_length-2 ? hosts_length-1 : current_row+1;
@@ -136,7 +139,7 @@ int main(int argc, char *argv[]){
                 break;
             case '\r':
                 endwin();
-                sprintf(command, "sshpass -p %s ssh %s@%s -p %s",
+                snprintf(command, 100, "sshpass -p %s ssh %s@%s -p %s",
                         hosts[current_row]->password,
                         hosts[current_row]->username,
                         hosts[current_row]->ip,
@@ -151,6 +154,7 @@ int main(int argc, char *argv[]){
     }/*}}}*/
 
     endwin();
+    free(config_file); config_file=NULL;
     free(command); command=NULL;
     free(header); header=NULL;
     free(seperation); seperation=NULL;
