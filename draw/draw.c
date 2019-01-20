@@ -35,7 +35,6 @@ void show(
         printw("%.20s\n", hosts[i]->comment);
         attroff(A_REVERSE);
     }
-    /** mvchgat(current_row+2, 0, 78+strlen(hosts[current_row]->comment), A_REVERSE, 1, NULL); */
     curs_set(0);
     refresh();
 }
