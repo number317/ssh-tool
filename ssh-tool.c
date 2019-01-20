@@ -5,15 +5,15 @@
 #include <locale.h>
 #include <ncurses.h>
 #include <libconfig.h>
-#include "config.h"
-#include "draw.h"
+#include "config/config.h"
+#include "draw/draw.h"
+
+void get_conf(config_t **, char *,
+        char ***, int *,
+        char **, int *,
+        host ***, int *);
 
 int main(int argc, char *argv[]){
-
-    setlocale(LC_ALL, "");
-    initscr();
-    cbreak();
-    noecho();
 
 /*{{{ init config */
     char *config_file = (char*)calloc(100, sizeof(char));
@@ -21,34 +21,41 @@ int main(int argc, char *argv[]){
         snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg", getenv("HOME"));
     else
         snprintf(config_file, 100, argv[1]);
+
     config_t *config = malloc(sizeof(config_t));
 
     config_init(config);
-    config_read_file(config, config_file);
+    config = set_config_file(config, config_file);
     
     /** header */
-    int header_length = config_setting_length(
-            config_lookup(config, "header")
-            );//header_length should be 6
+    // header_length should be 6
+    int header_length = get_length(config, "header");
     char **header = (char**)calloc(header_length, sizeof(char*));
-    get_header(config, header, header_length);
 
     /** seperation */
-    int seperation_length = config_setting_get_int(
-            config_lookup(config, "seperation_length")
-            );
+    int seperation_length = get_length(config, "seperation_length");
+    error_handle(seperation_length < 0,
+            "Error! seperation_length config error\n");
     char *seperation = (char*)calloc(seperation_length, sizeof(char));
-    get_seperation(config, seperation, seperation_length);
 
     /** hosts */
-    int hosts_length = config_setting_length(
-            config_lookup(config, "hosts")
-            );
+    int hosts_length = get_length(config, "hosts");
     host **hosts = (host**)calloc(hosts_length, sizeof(host*));
-    get_hosts(config, hosts, hosts_length);
+
+    get_conf(
+            &config, config_file,
+            &header, &header_length,
+            &seperation, &seperation_length,
+            &hosts, &hosts_length
+            );
     int current_row=0;
     int show_password=0;
 /*}}}*/
+
+    setlocale(LC_ALL, "");
+    initscr();
+    cbreak();
+    noecho();
 
     show(header, seperation, hosts, hosts_length, current_row, show_password);
 
@@ -70,25 +77,13 @@ int main(int argc, char *argv[]){
                     snprintf(command, 100, "%s %s", getenv("EDITOR"), config_file);
                     system(command);
 
-                    config_init(config);
-                    config_read_file(config, config_file);
-                    header_length = config_setting_length(
-                            config_lookup(config, "header")
+                    get_conf(
+                            &config, config_file,
+                            &header, &header_length,
+                            &seperation, &seperation_length,
+                            &hosts, &hosts_length
                             );
-                    header = (char**)calloc(header_length, sizeof(char*));
-                    get_header(config, header, header_length);
 
-                    seperation_length = config_setting_get_int(
-                            config_lookup(config, "seperation_length")
-                            );
-                    seperation = (char*)calloc(seperation_length, sizeof(char));
-                    get_seperation(config, seperation, seperation_length);
-
-                    hosts_length = config_setting_length(
-                            config_lookup(config, "hosts")
-                            );
-                    hosts = (host**)calloc(hosts_length, sizeof(host*));
-                    get_hosts(config, hosts, hosts_length);
                     current_row=0;
                     show_password=0;
                 }
@@ -105,25 +100,14 @@ int main(int argc, char *argv[]){
             case 'r':
                 endwin();
                 clear();
-                config_init(config);
-                config_read_file(config, config_file);
-                header_length = config_setting_length(
-                        config_lookup(config, "header")
-                        );
-                header = (char**)calloc(header_length, sizeof(char*));
-                get_header(config, header, header_length);
 
-                seperation_length = config_setting_get_int(
-                        config_lookup(config, "seperation_length")
+                get_conf(
+                        &config, config_file,
+                        &header, &header_length,
+                        &seperation, &seperation_length,
+                        &hosts, &hosts_length
                         );
-                seperation = (char*)calloc(seperation_length, sizeof(char));
-                get_seperation(config, seperation, seperation_length);
 
-                hosts_length = config_setting_length(
-                        config_lookup(config, "hosts")
-                        );
-                hosts = (host**)calloc(hosts_length, sizeof(host*));
-                get_hosts(config, hosts, hosts_length);
                 current_row=0;
                 show_password=0;
                 show(header, seperation, hosts, hosts_length, current_row, show_password);
@@ -160,4 +144,22 @@ int main(int argc, char *argv[]){
     free(hosts); hosts=NULL;
     config_destroy(config);
     return 0;
+}
+
+void get_conf(
+        config_t **config, char *config_file,
+        char ***header, int *header_length,
+        char **seperation, int *seperation_length,
+        host ***hosts, int *hosts_length
+        ) {
+
+    *config = set_config_file(*config, config_file);
+
+    *header_length = get_length(*config, "header");
+    *seperation_length = get_length(*config, "seperation_length");
+    *hosts_length = get_length(*config, "hosts");
+
+    *header = get_header(*config, *header, *header_length);
+    *seperation = get_seperation(*config, *seperation, *seperation_length);
+    *hosts = get_hosts(*config, *hosts, *hosts_length);
 }

@@ -11,7 +11,8 @@ void show(
         int show_password
         ) {
 
-    printw("%-15s", header[0]);
+    // make sure start from first line to draw
+    mvprintw(0, 0, "%-15s", header[0]);
     printw("%-18s", header[1]);
     printw("%-8s", header[2]);
     printw("%-15s", header[3]);
@@ -20,6 +21,8 @@ void show(
 
     mvprintw(1, 0, "%s\n", seperation);
     for(int i=0; i<hosts_length; i++) {
+        if(i==current_row)
+            attron(A_REVERSE);
         printw("%-15.14s%-18.17s%-8.7s%-15.14s",
                 hosts[i]->hostname,
                 hosts[i]->ip,
@@ -29,9 +32,10 @@ void show(
             printw("%-22.21s", "************");
         else
             printw("%-22.21s", hosts[i]->password);
-        printw("%-20s\n", hosts[i]->comment);
+        printw("%.20s\n", hosts[i]->comment);
+        attroff(A_REVERSE);
     }
-    mvchgat(current_row+2, 0, 78+strlen(hosts[current_row]->comment), A_REVERSE, 1, NULL);
+    /** mvchgat(current_row+2, 0, 78+strlen(hosts[current_row]->comment), A_REVERSE, 1, NULL); */
     curs_set(0);
     refresh();
 }
