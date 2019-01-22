@@ -58,3 +58,9 @@ The config file should have `hostname`, `ip`, `port`, `user`, `password`, `intro
 ![hide](./img/hide.jpg)
 
 ![show](./img/show.jpg)
+
+# docker
+
+```bash
+docker run -it --rm cheon/ssh-tool ssh-tool
+```

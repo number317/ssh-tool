@@ -6,7 +6,7 @@ ADD config /opt/ssh-tool/config
 ADD draw /opt/ssh-tool/draw
 ADD host /opt/ssh-tool/host
 RUN apk update && \
-    apk add --no-cache sshpass gcc make ncurses-dev libc-dev libconfig-dev openssh && \
+    apk add --no-cache sshpass gcc make ncurses-dev libc-dev libconfig-dev openssh vim && \
     cd /opt/ssh-tool && \
     make && \
     ln -sf $PWD/ssh-tool /usr/bin/ssh-tool && \
@@ -15,5 +15,6 @@ RUN apk update && \
     mkdir -p /root/.ssh/ && \
     echo "StrictHostKeyChecking no" > /root/.ssh/config && \
     apk del gcc make
+ENV EDITOR vim
 
 CMD ["/bin/sh"]
