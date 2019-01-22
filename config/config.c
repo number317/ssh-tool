@@ -86,15 +86,53 @@ host** get_hosts(
     error_handle(!new_hosts,
             "Error! Realloc memory error for hosts\n");
     for(int i=0; i<hosts_length; i++) {
-        host *temp = (host*)malloc(sizeof(host));
+        new_hosts[i] = (host*)malloc(sizeof(host));
         config_setting_t *hosts_item = config_setting_get_elem(host_list, i);
-        config_setting_lookup_string(hosts_item, "hostname", &(temp->hostname));
-        config_setting_lookup_string(hosts_item, "ip", &(temp->ip));
-        config_setting_lookup_string(hosts_item, "port", &(temp->port));
-        config_setting_lookup_string(hosts_item, "username", &(temp->username));
-        config_setting_lookup_string(hosts_item, "password", &(temp->password));
-        config_setting_lookup_string(hosts_item, "comment", &(temp->comment));
-        new_hosts[i]=temp;
+        config_setting_lookup_string(hosts_item, "hostname",
+                &(new_hosts[i]->hostname));
+        config_setting_lookup_string(hosts_item, "ip", &(new_hosts[i]->ip));
+        config_setting_lookup_string(hosts_item, "port",
+                &(new_hosts[i]->port));
+        config_setting_lookup_string(hosts_item, "username",
+                &(new_hosts[i]->username));
+        config_setting_lookup_string(hosts_item, "password",
+                &(new_hosts[i]->password));
+        config_setting_lookup_string(hosts_item, "comment",
+                &(new_hosts[i]->comment));
     }
     return new_hosts;
+}
+
+void clean_hosts_content(host **hosts, int hosts_length) {
+    for(int i=0; i<hosts_length; i++)
+        free(hosts[i]);
+}
+
+conf_set* get_conf_set(config_t **config, char *config_file, conf_set *confs) {
+    set_config_file(*config, config_file);
+
+    confs->header_length = get_length(*config, "header");
+    confs->seperation_length = get_length(*config, "seperation_length");
+    confs->hosts_length = get_length(*config, "hosts");
+
+    confs->header = get_header(*config, confs->header, confs->header_length);
+    confs->seperation = get_seperation(*config, confs->seperation,
+            confs->seperation_length);
+    confs->hosts = get_hosts(*config, confs->hosts, confs->hosts_length);
+    return confs;
+}
+
+void clean_conf_set(conf_set *confs) {
+    free(confs->header);
+    confs->header = NULL;
+    free(confs->seperation);
+    confs->seperation = NULL;
+    for(int i=0; i<confs->hosts_length; i++) {
+        free(confs->hosts[i]);
+        confs->hosts[i] = NULL;
+    }
+    free(confs->hosts);
+    confs->hosts = NULL;
+    free(confs);
+    confs = NULL;
 }
