@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
     if(argc!=2)
         snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg", getenv("HOME"));
     else
-        snprintf(config_file, 100, argv[1]);
+        snprintf(config_file, 100, "%s", argv[1]);
 
     config_t *config = malloc(sizeof(config_t));
 

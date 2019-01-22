@@ -5,7 +5,7 @@
 
 void error_handle(int condition, char *message) {
     if(condition) {
-        fprintf(stderr, message);
+        fprintf(stderr, "%s", message);
         exit(1);
     }
 }
@@ -70,7 +70,7 @@ char* get_seperation(
             "Error! Realloc memory error for seperation\n");
     memset(new_seperation, 0, seperation_length*char_width+1);
     for(int i=0; i<seperation_length;i++)
-        snprintf(new_seperation+i*char_width, char_width+1, seperation_char);
+        snprintf(new_seperation+i*char_width, char_width+1, "%s", seperation_char);
     return new_seperation;
 }
 
