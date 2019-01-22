@@ -116,5 +116,7 @@ int main(int argc, char *argv[]){
     free(command); command=NULL;
     clean_conf_set(confs);
     config_destroy(config);
+    free(config);
+    config=NULL;
     return 0;
 }
