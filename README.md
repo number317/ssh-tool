@@ -1,5 +1,6 @@
-![travisci](https://www.travis-ci.org/number317/ssh-tool.svg?branch=master)
+[![Build Status](https://www.travis-ci.org/number317/ssh-tool.svg?branch=master)](https://www.travis-ci.org/number317/ssh-tool)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=number317_ssh-tool&metric=alert_status)](https://sonarcloud.io/dashboard?id=number317_ssh-tool)
+
 # Intro
 
 This is a small tool to manage ssh server info in command line. Write down the servers' info in the config file so that you don't need to remember the servers' ip, password or port.
