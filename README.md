@@ -1,4 +1,5 @@
 ![travisci](https://www.travis-ci.org/number317/ssh-tool.svg?branch=master)
+![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=number317_ssh-tool&metric=alert_status)](https://sonarcloud.io/dashboard?id=number317_ssh-tool)
 
 # Intro
 
