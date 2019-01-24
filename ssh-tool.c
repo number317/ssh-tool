@@ -52,6 +52,7 @@ int main(int argc, char *argv[]){
         {
             case 'e':
                 endwin();
+                clear();
                 if(!getenv("EDITOR")) {
                     fprintf(stderr, "Your editor haven't been set!\n"
                             "3 seconds later will go back...\n");
