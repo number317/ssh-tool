@@ -93,6 +93,8 @@ host** get_hosts(
         config_setting_lookup_string(hosts_item, "ip", &(new_hosts[i]->ip));
         config_setting_lookup_string(hosts_item, "port",
                 &(new_hosts[i]->port));
+        config_setting_lookup_string(hosts_item, "use_key",
+                &(new_hosts[i]->use_key));
         config_setting_lookup_string(hosts_item, "username",
                 &(new_hosts[i]->username));
         config_setting_lookup_string(hosts_item, "password",

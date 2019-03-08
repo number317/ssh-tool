@@ -96,11 +96,17 @@ int main(int argc, char *argv[]){
                 break;
             case '\r':
                 endwin();
-                snprintf(command, 100, "sshpass -p %s ssh %s@%s -p %s",
-                        confs->hosts[current_row]->password,
-                        confs->hosts[current_row]->username,
-                        confs->hosts[current_row]->ip,
-                        confs->hosts[current_row]->port);
+                if(strcmp(confs->hosts[current_row]->use_key, "false")==0)
+                    snprintf(command, 100, "sshpass -p %s ssh %s@%s -p %s",
+                            confs->hosts[current_row]->password,
+                            confs->hosts[current_row]->username,
+                            confs->hosts[current_row]->ip,
+                            confs->hosts[current_row]->port);
+                else
+                    snprintf(command, 100, "ssh %s@%s -p %s",
+                            confs->hosts[current_row]->username,
+                            confs->hosts[current_row]->ip,
+                            confs->hosts[current_row]->port);
                 printf("connect to %s(%s)...\n",
                         confs->hosts[current_row]->hostname,
                         confs->hosts[current_row]->ip);
