@@ -34,9 +34,10 @@ seperation_char="━"
 seperation_length=90;
 hosts=(
         {
-        hostname="test2";
+        hostname="test1";
         ip="111.111.111.111";
         port="22";
+        use_key="false"
         username="root";
         password="admin";
         comment="test1";
@@ -45,14 +46,33 @@ hosts=(
         hostname="test2";
         ip="222.222.222.222";
         port="22";
+        use_key="true"
+        username="root";
+        password="<usekey>";
+        comment="test2";
+        },
+        {
+        hostname="test3";
+        ip="333.333.333.333";
+        port="22";
+        use_key="false"
         username="root";
         password="admin";
-        comment="test2";
+        comment="test3";
+        },
+        {
+        hostname="test4";
+        ip="444.444.444.444";
+        port="22";
+        use_key="false"
+        username="root";
+        password="admin";
+        comment="test4";
         }
       );
 ```
 
-The config file should have `hostname`, `ip`, `port`, `user`, `password`, `intro` six part.
+The config file should have `hostname`, `ip`, `port`, `use_key`, `user`, `password`, `intro` seven part.
 
 # screenshot
 
