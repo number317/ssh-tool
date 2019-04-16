@@ -8,13 +8,29 @@
 #include "config/config.h"
 #include "draw/draw.h"
 
+void usage();
+
 int main(int argc, char *argv[]){
     /*{{{ init config */
     char *config_file = (char*)calloc(100, sizeof(char));
-    if(argc!=2)
-        snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg", getenv("HOME"));
-    else
-        snprintf(config_file, 100, "%s", argv[1]);
+
+    switch(argc){
+        case 1:
+            snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg", getenv("HOME"));
+            break;
+        case 2:
+            if(access(argv[1], R_OK)==0)
+                snprintf(config_file, 100, "%s", argv[1]);
+            else{
+                fprintf(stderr, "config file %s doesn't exist or you have wrong permission\n", argv[1]);
+                usage();
+                exit(1);
+            }
+            break;
+        default:
+            usage();
+            exit(1);
+    }
 
     config_t *config = malloc(sizeof(config_t));
 
@@ -54,9 +70,10 @@ int main(int argc, char *argv[]){
                 endwin();
                 clear();
                 if(!getenv("EDITOR")) {
-                    fprintf(stderr, "Your editor haven't been set!\n"
-                            "3 seconds later will go back...\n");
-                    sleep(3);
+                    fprintf(stderr, "%s","Your editor haven't been set!\n"
+                            "Please set 'EDITOR' environment variable first.\n"
+                            "press 'Enter' to continue ...");
+                    getchar();
                 }
                 else {
                     snprintf(command, 100, "%s %s", getenv("EDITOR"), config_file);
@@ -126,4 +143,16 @@ int main(int argc, char *argv[]){
     free(config);
     config=NULL;
     return 0;
+}
+
+void usage(){
+    printf("usage: ssh-tool <config_file>\n");
+    printf("shortcut:\n");
+    printf("   'j': move down\n");
+    printf("   'k': move up\n");
+    printf("   'G': move to last\n");
+    printf("   'r': refresh\n");
+    printf("   's': toggle password\n");
+    printf("   'Enter': connect\n");
+    printf("   'q': quit\n");
 }
