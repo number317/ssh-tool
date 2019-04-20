@@ -9,6 +9,7 @@ typedef struct _conf_set {
     int header_length;
     char *seperation;
     int seperation_length;
+    int hosts_perpage;
     host **hosts;
     int hosts_length;
 } conf_set;
@@ -22,5 +23,6 @@ host** get_hosts(config_t*, host **, int);
 void clean_hosts_content(host **, int);
 conf_set* get_conf_set(config_t **, char *, conf_set *);
 void clean_conf_set(conf_set *);
+void print_conf_set(conf_set *);
 
 #endif

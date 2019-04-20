@@ -3,7 +3,7 @@
 
 # Intro
 
-This is a small tool to manage ssh server info in command line. Write down the servers' info in the config file so that you don't need to remember the servers' ip, password or port.
+This is a small tool to manage ssh server info in command line. Write the servers' info down in the config file so that you don't need to remember the servers' ip, password or port.
 
 # Dependency
 
@@ -16,10 +16,15 @@ This is a small tool to manage ssh server info in command line. Write down the s
 * <kbd>e</kbd>: edit config with `$EDITOR`
 * <kbd>j</kbd>: move down
 * <kbd>k</kbd>: move up
+* <kbd>J</kbd>: next page
+* <kbd>K</kbd>: prev page
 * <kbd>r</kbd>: reload
+* <kbd>G</kbd>: move to last page
+* <kbd>$</kbd>: move to last row of current page
+* <kbd>0</kbd>: move to first row of current page
+* <kbd>1-9</kbd>: move to page 1-9
 * <kbd>s</kbd>: toggle password
 * <kbd>q</kbd>: exit
-* <kbd>G</kbd>: move to last
 * <kbd>Enter</kbd>: connect
 
 # config
@@ -32,6 +37,8 @@ config template:
 header=["hostname", "ip", "port", "username", "password", "intro"];
 seperation_char="━"
 seperation_length=90;
+# how many rows to show in one page
+hosts_perpage=30;
 hosts=(
         {
         hostname="test1";

@@ -115,6 +115,7 @@ conf_set* get_conf_set(config_t **config, char *config_file, conf_set *confs) {
 
     confs->header_length = get_length(*config, "header");
     confs->seperation_length = get_length(*config, "seperation_length");
+    confs->hosts_perpage = get_length(*config, "hosts_perpage");
     confs->hosts_length = get_length(*config, "hosts");
 
     confs->header = get_header(*config, confs->header, confs->header_length);
@@ -137,4 +138,25 @@ void clean_conf_set(conf_set *confs) {
     confs->hosts = NULL;
     free(confs);
     confs = NULL;
+}
+
+void print_conf_set(conf_set *confs) {
+    printf("header_length: %d\n", confs->header_length);
+    for(int i=0; i<confs->header_length; i++)
+        printf("header[%d]: %s\n", i, confs->header[i]);
+    printf("seperation_length: %d\n", confs->seperation_length);
+    printf("%s\n", confs->seperation);
+    printf("hosts_perpage: %d\n", confs->hosts_perpage);
+    int pages = confs->hosts_length%confs->hosts_perpage==0?
+        confs->hosts_length/confs->hosts_perpage :
+        confs->hosts_length/confs->hosts_perpage+1;
+    printf("pages: %d\n", pages);
+    printf("hosts_length: %d\n", confs->hosts_length);
+    for(int i=0; i<confs->hosts_length; i++){
+        printf("%-15.14s%-18.17s%-8.7s%-15.14s\n",
+                confs->hosts[i]->hostname,
+                confs->hosts[i]->ip,
+                confs->hosts[i]->port,
+                confs->hosts[i]->username);
+    }
 }
