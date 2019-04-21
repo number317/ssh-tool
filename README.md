@@ -23,6 +23,9 @@ This is a small tool to manage ssh server info in command line. Write the server
 * <kbd>$</kbd>: move to last row of current page
 * <kbd>0</kbd>: move to first row of current page
 * <kbd>1-9</kbd>: move to page 1-9
+* <kbd>/</kbd>: search
+* <kbd>n</kbd>: search next
+* <kbd>N</kbd>: search prev
 * <kbd>s</kbd>: toggle password
 * <kbd>q</kbd>: exit
 * <kbd>Enter</kbd>: connect
@@ -80,6 +83,8 @@ hosts=(
 ```
 
 The config file should have `hostname`, `ip`, `port`, `use_key`, `user`, `password`, `intro` seven part.
+
+If you use identity file to login in, the `password` should be the path of identity file.
 
 # screenshot
 

@@ -229,6 +229,9 @@ void usage(){
     printf("   '1-9': move to page 1-9\n");
     printf("   '0': move to first row of current page\n");
     printf("   '$': move to last row of current page\n");
+    printf("   '/': search\n");
+    printf("   'n': search next\n");
+    printf("   'N': search prev\n");
     printf("   's': toggle password\n");
     printf("   'Enter': connect\n");
     printf("   'q': quit\n");
