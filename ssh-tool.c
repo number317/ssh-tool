@@ -5,23 +5,24 @@
 #include <locale.h>
 #include <ncurses.h>
 #include <libconfig.h>
-#include "config/config.h"
 #include "draw/draw.h"
-
-void usage();
+#include "ssh-tool.h"
 
 int main(int argc, char *argv[]){
     /*{{{ args handler */
     char *config_file = (char*)calloc(100, sizeof(char));
     switch(argc){
         case 1:
-            snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg", getenv("HOME"));
+            snprintf(config_file, 100, "%s/.config/ssh-tool/hosts.cfg",
+                    getenv("HOME"));
             break;
         case 2:
             if(access(argv[1], R_OK)==0)
                 snprintf(config_file, 100, "%s", argv[1]);
             else{
-                fprintf(stderr, "config file %s doesn't exist or you have wrong permission\n", argv[1]);
+                fprintf(stderr,
+                        "config file %s doesn't exist"
+                        " or you have wrong permission\n", argv[1]);
                 usage();
                 exit(1);
             }
@@ -56,6 +57,8 @@ int main(int argc, char *argv[]){
     int current_row = 0;
     int row_start = 0;
     int row_end = 0;
+    int status_line = confs->hosts_length > confs->hosts_perpage ?
+                    confs->hosts_perpage+5 : confs->hosts_length+5;
     int show_password = 0;
     /*}}}*/
 
@@ -63,7 +66,7 @@ int main(int argc, char *argv[]){
     setlocale(LC_ALL, "");
     initscr();
     cbreak();
-    noecho();
+    /** noecho(); */
     show(confs, current_page, current_row, show_password);
     /*}}}*/
 
@@ -84,13 +87,16 @@ int main(int argc, char *argv[]){
                     getchar();
                 }
                 else {
-                    snprintf(command, 100, "%s %s", getenv("EDITOR"), config_file);
+                    snprintf(command, 100, "%s %s",
+                            getenv("EDITOR"), config_file);
                     system(command);
                     clean_hosts_content(confs->hosts, confs->hosts_length);
                     confs = get_conf_set(&config, config_file, confs);
                     pages = confs->hosts_length%confs->hosts_perpage==0?
                         confs->hosts_length/confs->hosts_perpage-1 :
                         confs->hosts_length/confs->hosts_perpage;
+                    status_line = confs->hosts_length > confs->hosts_perpage ?
+                        confs->hosts_perpage+5 : confs->hosts_length+5;
                     current_page = 0;
                     current_row = 0;
                     show_password = 0;
@@ -100,8 +106,10 @@ int main(int argc, char *argv[]){
             case 'j':
                 row_end =
                     (current_page+1)*confs->hosts_perpage>confs->hosts_length ?
-                    confs->hosts_length : (current_page+1)*confs->hosts_perpage;
-                current_row = current_row>=row_end-1 ? row_end -1 : current_row+1;
+                    confs->hosts_length :
+                    (current_page+1)*confs->hosts_perpage;
+                current_row = current_row>=row_end-1 ?
+                    row_end -1 : current_row+1;
                 show(confs, current_page, current_row, show_password);
                 break;
             case 'k':
@@ -124,6 +132,27 @@ int main(int argc, char *argv[]){
                 clear();
                 show(confs, current_page, current_row, show_password);
                 break;
+            case '/':
+                mvprintw(status_line, 0, "%c", operator);
+                show(confs, current_page, current_row, show_password);
+                mvgetstr(status_line, 1, command);
+            case 'n':
+            case 'N':
+                current_row = get_match_row(confs, current_row,
+                        operator=='N' ? -1 : 1, command);
+                int old_current_page = current_page;
+                if(confs->hosts_perpage >= confs->hosts_length
+                        || current_row < confs->hosts_perpage)
+                    current_page = 0;
+                else
+                    current_page = current_row%confs->hosts_perpage==0 ?
+                        current_row/confs->hosts_perpage :
+                        current_row/confs->hosts_perpage;
+                if(current_page != old_current_page)
+                    clear();
+                mvprintw(status_line, 0, "%s", "                      ");
+                show(confs, current_page, current_row, show_password);
+                break;
             case 'r':
                 endwin();
                 clear();
@@ -132,6 +161,8 @@ int main(int argc, char *argv[]){
                 current_page=0;
                 current_row=0;
                 show_password=0;
+                status_line = confs->hosts_length > confs->hosts_perpage ?
+                    confs->hosts_perpage+5 : confs->hosts_length+5;
                 show(confs, current_page, current_row, show_password);
                 break;
             case 's':
@@ -144,14 +175,14 @@ int main(int argc, char *argv[]){
                 break;
             case '1': case '2': case '3': case '4': case '5': case '6':
             case '7': case '8': case '9':
-                current_page = operator-48 > pages ? pages : operator-48;
+                current_page = operator-49>pages ? pages : operator-49;
                 current_row = current_page*confs->hosts_perpage;
                 clear();
                 show(confs, current_page, current_row, show_password);
                 break;
             case '$':
                 current_row =
-                    (current_page+1)*confs->hosts_perpage > confs->hosts_length ?
+                    (current_page+1)*confs->hosts_perpage>confs->hosts_length ?
                     confs->hosts_length-1 :
                     (current_page+1)*confs->hosts_perpage-1;
                 show(confs, current_page, current_row, show_password);
@@ -165,21 +196,7 @@ int main(int argc, char *argv[]){
                 break;
             case '\r':
                 endwin();
-                if(strcmp(confs->hosts[current_row]->use_key, "false")==0)
-                    snprintf(command, 100, "sshpass -p %s ssh %s@%s -p %s",
-                            confs->hosts[current_row]->password,
-                            confs->hosts[current_row]->username,
-                            confs->hosts[current_row]->ip,
-                            confs->hosts[current_row]->port);
-                else
-                    snprintf(command, 100, "ssh %s@%s -p %s",
-                            confs->hosts[current_row]->username,
-                            confs->hosts[current_row]->ip,
-                            confs->hosts[current_row]->port);
-                printf("connect to %s(%s)...\n",
-                        confs->hosts[current_row]->hostname,
-                        confs->hosts[current_row]->ip);
-                system(command);
+                login(confs->hosts[current_row], command);
                 show(confs, current_page, current_row, show_password);
                 break;
             default:
@@ -187,7 +204,7 @@ int main(int argc, char *argv[]){
         }
     }/*}}}*/
 
-    /*{{{ clean */
+/*{{{ clean */
     endwin();
     free(config_file); config_file=NULL;
     free(command); command=NULL;
@@ -196,8 +213,9 @@ int main(int argc, char *argv[]){
     free(config);
     config=NULL;
     return 0;
-    /*}}}*/
 }
+/*}}}*/
+
 /*{{{ function usage*/
 void usage(){
     printf("usage: ssh-tool <config_file>\n");
@@ -214,4 +232,39 @@ void usage(){
     printf("   's': toggle password\n");
     printf("   'Enter': connect\n");
     printf("   'q': quit\n");
+}/*}}}*/
+
+/*{{{ function login */
+void login(host *h, char *command){
+    if(strcmp(h->use_key, "false")==0)
+        snprintf(command, 100, "sshpass -p %s ssh %s@%s -p %s",
+                h->password,
+                h->username,
+                h->ip,
+                h->port);
+    else
+        snprintf(command, 100, "ssh -i %s %s@%s -p %s",
+                h->password,
+                h->username,
+                h->ip,
+                h->port);
+    printf("connect to %s(%s)...\n",
+            h->hostname,
+            h->ip);
+    system(command);
+}
+/*}}}*/
+
+/*{{{ function get_match_row */
+int get_match_row(conf_set *confs,
+        int current_row, int direction, char *pattern) {
+    for(int i=current_row+direction; i<confs->hosts_length && i>0; i=i+direction)
+        if(strstr(confs->hosts[i]->hostname, pattern)!=NULL
+                || strstr(confs->hosts[i]->ip, pattern)!=NULL
+                || strstr(confs->hosts[i]->username, pattern)!=NULL
+                || strstr(confs->hosts[i]->comment, pattern)!=NULL){
+            current_row=i;
+            break;
+        }
+    return current_row;
 }/*}}}*/

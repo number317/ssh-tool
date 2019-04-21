@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include "draw.h"
 
-void show( conf_set *confs, int current_page, int current_row, int show_password) {
+void show(conf_set *confs, int current_page,
+        int current_row, int show_password) {
 
     // make sure start from first line to draw
     mvprintw(0, 0, "%-15s", confs->header[0]);
@@ -38,8 +39,7 @@ void show( conf_set *confs, int current_page, int current_row, int show_password
     int status_line = confs->hosts_length > confs->hosts_perpage ?
         confs->hosts_perpage+5 : confs->hosts_length+5;
     if(pages>0)
-        mvprintw(status_line, 60, "row %d of %d in page %d of %d",
-            current_row+1, confs->hosts_length, current_page+1, pages+1);
+        mvprintw(status_line, 80, "page %d of %d", current_page+1, pages+1);
     curs_set(0);
     refresh();
 }
