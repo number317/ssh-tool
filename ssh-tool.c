@@ -50,6 +50,7 @@ int main(int argc, char *argv[]){
     confs->hosts = (host**)malloc(sizeof(host*)*confs->hosts_length);
 
     confs = get_conf_set(&config, config_file, confs);
+
     int pages = confs->hosts_length%confs->hosts_perpage==0?
         confs->hosts_length/confs->hosts_perpage-1 :
         confs->hosts_length/confs->hosts_perpage;
@@ -66,7 +67,6 @@ int main(int argc, char *argv[]){
     setlocale(LC_ALL, "");
     initscr();
     cbreak();
-    /** noecho(); */
     show(confs, current_page, current_row, show_password);
     /*}}}*/
 
@@ -145,9 +145,7 @@ int main(int argc, char *argv[]){
                         || current_row < confs->hosts_perpage)
                     current_page = 0;
                 else
-                    current_page = current_row%confs->hosts_perpage==0 ?
-                        current_row/confs->hosts_perpage :
-                        current_row/confs->hosts_perpage;
+                    current_page = current_row/confs->hosts_perpage; 
                 if(current_page != old_current_page)
                     clear();
                 mvprintw(status_line, 0, "%s", "                      ");
@@ -236,6 +234,10 @@ void usage(){
     printf("   'Enter': connect\n");
     printf("   'q': quit\n");
 }/*}}}*/
+
+int get_current_page(int current_row, int hosts_perpage) {
+    return (current_row+1)/hosts_perpage;
+}
 
 /*{{{ function login */
 void login(host *h, char *command){
