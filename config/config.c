@@ -52,16 +52,12 @@ char* get_seperation(
         int seperation_length) {
     char *seperation_char = (char *)config_setting_get_string(
             config_lookup(config, "seperation_char"));
-    error_handle(!seperation_char,
-            "Error! Config file doesn't have the seperation_char config\n");
     /*
      * make sure seperation has the enough space
      */
     int char_width = strlen(seperation_char);
     char *new_seperation;
     new_seperation = realloc(seperation, seperation_length*char_width+1);
-    error_handle(!new_seperation,
-            "Error! Realloc memory error for seperation\n");
     memset(new_seperation, 0, seperation_length*char_width+1);
     for(int i=0; i<seperation_length;i++)
         snprintf(new_seperation+i*char_width, char_width+1,
@@ -78,8 +74,6 @@ host** get_hosts(
             "Error! Config file doesn't have the hosts config\n");
     host **new_hosts;
     new_hosts = realloc(hosts, hosts_length*sizeof(host*));
-    error_handle(!new_hosts,
-            "Error! Realloc memory error for hosts\n");
     for(int i=0; i<hosts_length; i++) {
         new_hosts[i] = (host*)malloc(sizeof(host));
         config_setting_t *hosts_item = config_setting_get_elem(host_list, i);
