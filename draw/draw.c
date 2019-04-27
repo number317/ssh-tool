@@ -1,9 +1,14 @@
 #include <ncurses.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../utility/utility.h"
 #include "draw.h"
 
-void show(conf_set *confs, int current_row, int show_password) {
+void show(conf_set *confs, int current_row, int show_password, int old_page) {
+
+    int current_page = current_row/confs->hosts_perpage;
+    if(old_page!=current_page)
+        clear();
 
     // make sure start from first line to draw
     mvprintw(0, 0, "%-15s", confs->header[0]);
@@ -14,10 +19,9 @@ void show(conf_set *confs, int current_row, int show_password) {
     printw("%-20s", confs->header[5]);
 
     mvprintw(1, 0, "%s\n", confs->seperation);
-    int current_page = current_row/confs->hosts_perpage;
+
     int start = current_page*confs->hosts_perpage;
-    int end = start + confs->hosts_perpage > confs->hosts_length ?
-        confs->hosts_length : start + confs->hosts_perpage;
+    int end = min(start + confs->hosts_perpage, confs->hosts_length);
     for(int i=start; i<end; i++) {
         if(i==current_row) attron(A_REVERSE);
         printw("%-15.14s%-18.17s%-8.7s%-15.14s",
@@ -30,13 +34,9 @@ void show(conf_set *confs, int current_row, int show_password) {
         printw("%.20s\n", confs->hosts[i]->comment);
         attroff(A_REVERSE);
     }
-    int pages = confs->hosts_length%confs->hosts_perpage==0?
-        confs->hosts_length/confs->hosts_perpage-1 :
-        confs->hosts_length/confs->hosts_perpage;
-    int status_line = confs->hosts_length > confs->hosts_perpage ?
-        confs->hosts_perpage+5 : confs->hosts_length+5;
-    if(pages>0)
-        mvprintw(status_line, 80, "page %d of %d", current_page+1, pages+1);
+    int status_line = min(confs->hosts_perpage+5, confs->hosts_length+5);
+    if(confs->pages>0)
+        mvprintw(status_line, 80, "page %d of %d", current_page+1, confs->pages+1);
     curs_set(0);
     refresh();
 }

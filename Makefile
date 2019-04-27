@@ -1,6 +1,6 @@
 cc = gcc
 target = ssh-tool
-source = ssh-tool.c host/* config/* draw/*
+source = ssh-tool.c ssh-tool.h host/* config/* draw/* utility/*
 
 $(target): $(source)
 	$(cc) -o $(target) -Wall -std=c11 $(source) -lncursesw -lconfig

@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 #include <string.h>
 #include <locale.h>
 #include <ncurses.h>
 #include <libconfig.h>
 #include "draw/draw.h"
+#include "utility/utility.h"
 #include "ssh-tool.h"
 
 int main(int argc, char *argv[]){
@@ -51,15 +53,9 @@ int main(int argc, char *argv[]){
 
     confs = get_conf_set(&config, config_file, confs);
 
-    int pages = confs->hosts_length%confs->hosts_perpage==0?
-        confs->hosts_length/confs->hosts_perpage-1 :
-        confs->hosts_length/confs->hosts_perpage;
     int current_row = 0;
     int current_page = current_row/confs->hosts_perpage;
-    int row_start = 0;
-    int row_end = 0;
-    int status_line = confs->hosts_length > confs->hosts_perpage ?
-                    confs->hosts_perpage+5 : confs->hosts_length+5;
+    int status_line = min(confs->hosts_perpage+5, confs->hosts_length+5);
     int show_password = 0;
     /*}}}*/
 
@@ -67,7 +63,7 @@ int main(int argc, char *argv[]){
     setlocale(LC_ALL, "");
     initscr();
     cbreak();
-    show(confs, current_row, show_password);
+    show(confs, current_row, show_password, current_page);
     /*}}}*/
 
     /*{{{ keyboard event */
@@ -80,7 +76,6 @@ int main(int argc, char *argv[]){
             /*{{{ edit config file */
             case 'e':
                 endwin();
-                clear();
                 if(!getenv("EDITOR")) {
                     fprintf(stderr, "%s","Your editor haven't been set!\n"
                             "Please set 'EDITOR' environment variable first.\n"
@@ -93,137 +88,99 @@ int main(int argc, char *argv[]){
                     system(command);
                     clean_hosts_content(confs->hosts, confs->hosts_length);
                     confs = get_conf_set(&config, config_file, confs);
-                    pages = confs->hosts_length%confs->hosts_perpage==0?
-                        confs->hosts_length/confs->hosts_perpage-1 :
-                        confs->hosts_length/confs->hosts_perpage;
-                    status_line = confs->hosts_length > confs->hosts_perpage ?
-                        confs->hosts_perpage+5 : confs->hosts_length+5;
+
+                    status_line = min(confs->hosts_perpage+5,
+                            confs->hosts_length+5);
                     current_row = 0;
                     show_password = 0;
                 }
-                show(confs, current_row, show_password);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
-            /*{{{ row down */
-            case 'j':
+            /*{{{ row up and down */
+            case 'j': case 'k':
                 current_page = current_row/confs->hosts_perpage;
-                row_end =
-                    (current_page+1)*confs->hosts_perpage>confs->hosts_length ?
-                    confs->hosts_length :
-                    (current_page+1)*confs->hosts_perpage;
-                current_row = current_row>=row_end-1 ?
-                    row_end -1 : current_row+1;
-                show(confs, current_row, show_password);
-                break;
-            /*}}}*/
-            /*{{{ row up */
-            case 'k':
-                current_page = current_row/confs->hosts_perpage;
-                row_start = current_page*confs->hosts_perpage;
-                current_row= current_row<=row_start ?
-                    row_start : current_row-1;
-                show(confs, current_row, show_password);
+                current_row = row_up_down(confs, current_row, operator);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ page down */
-            case 'J':
-                current_page= current_page+1>=pages ?
-                     pages : current_page+1;
-                current_row = current_page*confs->hosts_perpage;
-                clear();
-                show(confs, current_row, show_password);
-                break;
-            /*}}}*/
-             /*{{{ page up */
-            case 'K':
-                current_page= current_page-1<=0 ?
-                     0 : current_page-1;
-                current_row = current_page*confs->hosts_perpage;
-                clear();
-                show(confs, current_row, show_password);
+            case 'J': case 'K':
+                current_page = current_row/confs->hosts_perpage;
+                current_row = page_up_down(confs, current_row, operator)*
+                    confs->hosts_perpage;
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ search keywords */
             case '/':
                 mvprintw(status_line, 0, "%c", operator);
-                show(confs, current_row, show_password);
+                show(confs, current_row, show_password, current_page);
                 mvgetstr(status_line, 1, command);
             case 'n':
             case 'N':
+                current_page = current_row/confs->hosts_perpage;
                 current_row = get_match_row(confs, current_row,
                         operator=='N' ? -1 : 1, command);
-                int old_current_page = current_page;
-                if(confs->hosts_perpage >= confs->hosts_length
-                        || current_row < confs->hosts_perpage)
-                    current_page = 0;
-                else
-                    current_page = current_row/confs->hosts_perpage; 
-                current_page != old_current_page ?
-                    clear() :
-                    mvprintw(status_line, 0, "%s",
-                            "                                        "
-                            "                                        ");
-                show(confs, current_row, show_password);
+                mvprintw(status_line, 0, "%s",
+                        "                                        "
+                        "                                        ");
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ reload */
             case 'r':
                 endwin();
-                clear();
                 clean_hosts_content(confs->hosts, confs->hosts_length);
                 confs = get_conf_set(&config, config_file, confs);
                 current_page=0;
                 current_row=0;
                 show_password=0;
-                status_line = confs->hosts_length > confs->hosts_perpage ?
-                    confs->hosts_perpage+5 : confs->hosts_length+5;
-                show(confs, current_row, show_password);
+                status_line = min(confs->hosts_perpage+5,
+                        confs->hosts_length+5);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ show password */
             case 's':
                 show_password=(show_password+1)%2;
-                show(confs, current_row, show_password);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ go to the first line of current page*/
             case '0':
                 current_row = current_page*confs->hosts_perpage;
-                show(confs, current_row, show_password);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ go to n page */
             case '1': case '2': case '3': case '4': case '5': case '6':
             case '7': case '8': case '9':
-                current_page = operator-49>pages ? pages : operator-49;
-                current_row = current_page*confs->hosts_perpage;
-                clear();
-                show(confs, current_row, show_password);
+                current_page = current_row/confs->hosts_perpage;
+                current_row = min(operator-49, confs->pages)*
+                    confs->hosts_perpage;
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ go to the last line of current page */
             case '$':
-                current_row =
-                    (current_page+1)*confs->hosts_perpage>confs->hosts_length ?
-                    confs->hosts_length-1 :
-                    (current_page+1)*confs->hosts_perpage-1;
-                show(confs, current_row, show_password);
+                current_row = min((current_page+1)*confs->hosts_perpage-1,
+                        confs->hosts_length-1);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ go to the last line of last page */
             case 'G':
+                current_page = current_row/confs->hosts_perpage;
                 current_row = confs->hosts_length-1;
-                current_page = pages;
-                if(pages>0)
-                    clear();
-                show(confs, current_row, show_password);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             /*{{{ connect to server */
             case '\r':
                 endwin();
                 login(confs->hosts[current_row], command);
-                show(confs, current_row, show_password);
+                show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
             default:
@@ -264,6 +221,21 @@ void usage(){
     printf("   'q': quit\n");
 }/*}}}*/
 
+/*{{{ row up and down */
+int row_up_down(conf_set *confs, int current_row, char direction){
+    return direction=='j' ?
+        min(current_row+1, confs->hosts_length-1) : max(current_row-1, 0);
+}
+/*}}}*/
+
+/*{{{ page up and down */
+int page_up_down(conf_set *confs, int current_row, char direction){
+    return direction=='J' ?
+        min(current_row/confs->hosts_perpage+1, confs->pages) :
+        max(current_row/confs->hosts_perpage-1, 0);
+}
+/*}}}*/
+
 /*{{{ function login */
 void login(host *h, char *command){
     if(strcmp(h->use_key, "false")==0)
@@ -288,7 +260,8 @@ void login(host *h, char *command){
 /*{{{ function get_match_row */
 int get_match_row(conf_set *confs,
         int current_row, int direction, char *pattern) {
-    for(int i=current_row+direction; i<confs->hosts_length && i>0; i=i+direction)
+    for(int i=current_row+direction;
+            i<confs->hosts_length && i>0; i=i+direction)
         if(strstr(confs->hosts[i]->hostname, pattern)!=NULL
                 || strstr(confs->hosts[i]->ip, pattern)!=NULL
                 || strstr(confs->hosts[i]->username, pattern)!=NULL

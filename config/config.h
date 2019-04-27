@@ -10,11 +10,11 @@ typedef struct _conf_set {
     char *seperation;
     int seperation_length;
     int hosts_perpage;
+    int pages;
     host **hosts;
     int hosts_length;
 } conf_set;
 
-void error_handle(int, char *);
 config_t* set_config_file(config_t *, char *);
 int get_length(config_t *, char *);
 char** get_header(config_t *, char **, int);

@@ -1,14 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "../utility/utility.h"
 #include "config.h"
-
-void error_handle(int condition, char *message) {
-    if(condition) {
-        fprintf(stderr, "%s", message);
-        exit(1);
-    }
-}
 
 config_t* set_config_file(config_t *config, char *config_file) {
     if(! config_read_file(config, config_file)) {
@@ -117,6 +111,9 @@ conf_set* get_conf_set(config_t **config, char *config_file, conf_set *confs) {
     confs->header_length = get_length(*config, "header");
     confs->seperation_length = get_length(*config, "seperation_length");
     confs->hosts_perpage = get_length(*config, "hosts_perpage");
+    confs->pages = confs->hosts_length%confs->hosts_perpage==0?
+        confs->hosts_length/confs->hosts_perpage-1 :
+        confs->hosts_length/confs->hosts_perpage;
     confs->hosts_length = get_length(*config, "hosts");
 
     confs->header = get_header(*config, confs->header, confs->header_length);
@@ -148,10 +145,7 @@ void print_conf_set(conf_set *confs) {
     printf("seperation_length: %d\n", confs->seperation_length);
     printf("%s\n", confs->seperation);
     printf("hosts_perpage: %d\n", confs->hosts_perpage);
-    int pages = confs->hosts_length%confs->hosts_perpage==0?
-        confs->hosts_length/confs->hosts_perpage :
-        confs->hosts_length/confs->hosts_perpage+1;
-    printf("pages: %d\n", pages);
+    printf("pages: %d\n", confs->pages);
     printf("hosts_length: %d\n", confs->hosts_length);
     for(int i=0; i<confs->hosts_length; i++){
         printf("%-15.14s%-18.17s%-8.7s%-15.14s\n",
