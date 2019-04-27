@@ -1,10 +1,11 @@
 FROM alpine
 LABEL maintainer="cheon cheon0112358d@gmail.com"
 
-ADD *.c Makefile hosts.cfg /opt/ssh-tool/
+ADD *.c *.h Makefile hosts.cfg /opt/ssh-tool/
 ADD config /opt/ssh-tool/config
 ADD draw /opt/ssh-tool/draw
 ADD host /opt/ssh-tool/host
+ADD utility /opt/ssh-tool/utility
 RUN apk update && \
     apk add --no-cache sshpass gcc make ncurses-dev libc-dev libconfig-dev openssh vim && \
     cd /opt/ssh-tool && \

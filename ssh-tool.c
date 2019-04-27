@@ -94,6 +94,7 @@ int main(int argc, char *argv[]){
                     current_row = 0;
                     show_password = 0;
                 }
+                clear();
                 show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
@@ -138,6 +139,7 @@ int main(int argc, char *argv[]){
                 show_password=0;
                 status_line = min(confs->hosts_perpage+5,
                         confs->hosts_length+5);
+                clear();
                 show(confs, current_row, show_password, current_page);
                 break;
             /*}}}*/
