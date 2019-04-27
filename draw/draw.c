@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include "draw.h"
 
-void show(conf_set *confs, int current_page,
-        int current_row, int show_password) {
+void show(conf_set *confs, int current_row, int show_password) {
 
     // make sure start from first line to draw
     mvprintw(0, 0, "%-15s", confs->header[0]);
@@ -15,21 +14,19 @@ void show(conf_set *confs, int current_page,
     printw("%-20s", confs->header[5]);
 
     mvprintw(1, 0, "%s\n", confs->seperation);
+    int current_page = current_row/confs->hosts_perpage;
     int start = current_page*confs->hosts_perpage;
-    int end = (current_page+1)*confs->hosts_perpage > confs->hosts_length ?
-        confs->hosts_length : (current_page+1)*confs->hosts_perpage;
+    int end = start + confs->hosts_perpage > confs->hosts_length ?
+        confs->hosts_length : start + confs->hosts_perpage;
     for(int i=start; i<end; i++) {
-        if(i==current_row)
-            attron(A_REVERSE);
+        if(i==current_row) attron(A_REVERSE);
         printw("%-15.14s%-18.17s%-8.7s%-15.14s",
                 confs->hosts[i]->hostname,
                 confs->hosts[i]->ip,
                 confs->hosts[i]->port,
                 confs->hosts[i]->username);
-        if(!show_password)
-            printw("%-22.21s", "************");
-        else
-            printw("%-22.21s", confs->hosts[i]->password);
+        if(!show_password) printw("%-22.21s", "************");
+        else printw("%-22.21s", confs->hosts[i]->password);
         printw("%.20s\n", confs->hosts[i]->comment);
         attroff(A_REVERSE);
     }

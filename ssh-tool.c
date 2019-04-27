@@ -54,8 +54,8 @@ int main(int argc, char *argv[]){
     int pages = confs->hosts_length%confs->hosts_perpage==0?
         confs->hosts_length/confs->hosts_perpage-1 :
         confs->hosts_length/confs->hosts_perpage;
-    int current_page = 0;
     int current_row = 0;
+    int current_page = current_row/confs->hosts_perpage;
     int row_start = 0;
     int row_end = 0;
     int status_line = confs->hosts_length > confs->hosts_perpage ?
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
     setlocale(LC_ALL, "");
     initscr();
     cbreak();
-    show(confs, current_page, current_row, show_password);
+    show(confs, current_row, show_password);
     /*}}}*/
 
     /*{{{ keyboard event */
@@ -77,6 +77,7 @@ int main(int argc, char *argv[]){
     {
         switch(operator)
         {
+            /*{{{ edit config file */
             case 'e':
                 endwin();
                 clear();
@@ -97,44 +98,55 @@ int main(int argc, char *argv[]){
                         confs->hosts_length/confs->hosts_perpage;
                     status_line = confs->hosts_length > confs->hosts_perpage ?
                         confs->hosts_perpage+5 : confs->hosts_length+5;
-                    current_page = 0;
                     current_row = 0;
                     show_password = 0;
                 }
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ row down */
             case 'j':
+                current_page = current_row/confs->hosts_perpage;
                 row_end =
                     (current_page+1)*confs->hosts_perpage>confs->hosts_length ?
                     confs->hosts_length :
                     (current_page+1)*confs->hosts_perpage;
                 current_row = current_row>=row_end-1 ?
                     row_end -1 : current_row+1;
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ row up */
             case 'k':
+                current_page = current_row/confs->hosts_perpage;
                 row_start = current_page*confs->hosts_perpage;
                 current_row= current_row<=row_start ?
                     row_start : current_row-1;
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ page down */
             case 'J':
                 current_page= current_page+1>=pages ?
                      pages : current_page+1;
                 current_row = current_page*confs->hosts_perpage;
                 clear();
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+             /*{{{ page up */
             case 'K':
                 current_page= current_page-1<=0 ?
                      0 : current_page-1;
                 current_row = current_page*confs->hosts_perpage;
                 clear();
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ search keywords */
             case '/':
                 mvprintw(status_line, 0, "%c", operator);
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 mvgetstr(status_line, 1, command);
             case 'n':
             case 'N':
@@ -146,11 +158,15 @@ int main(int argc, char *argv[]){
                     current_page = 0;
                 else
                     current_page = current_row/confs->hosts_perpage; 
-                if(current_page != old_current_page)
-                    clear();
-                mvprintw(status_line, 0, "%s", "                      ");
-                show(confs, current_page, current_row, show_password);
+                current_page != old_current_page ?
+                    clear() :
+                    mvprintw(status_line, 0, "%s",
+                            "                                        "
+                            "                                        ");
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ reload */
             case 'r':
                 endwin();
                 clear();
@@ -161,48 +177,61 @@ int main(int argc, char *argv[]){
                 show_password=0;
                 status_line = confs->hosts_length > confs->hosts_perpage ?
                     confs->hosts_perpage+5 : confs->hosts_length+5;
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ show password */
             case 's':
                 show_password=(show_password+1)%2;
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ go to the first line of current page*/
             case '0':
                 current_row = current_page*confs->hosts_perpage;
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ go to n page */
             case '1': case '2': case '3': case '4': case '5': case '6':
             case '7': case '8': case '9':
                 current_page = operator-49>pages ? pages : operator-49;
                 current_row = current_page*confs->hosts_perpage;
                 clear();
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ go to the last line of current page */
             case '$':
                 current_row =
                     (current_page+1)*confs->hosts_perpage>confs->hosts_length ?
                     confs->hosts_length-1 :
                     (current_page+1)*confs->hosts_perpage-1;
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ go to the last line of last page */
             case 'G':
                 current_row = confs->hosts_length-1;
                 current_page = pages;
                 if(pages>0)
                     clear();
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
+            /*{{{ connect to server */
             case '\r':
                 endwin();
                 login(confs->hosts[current_row], command);
-                show(confs, current_page, current_row, show_password);
+                show(confs, current_row, show_password);
                 break;
+            /*}}}*/
             default:
                 break;
         }
     }/*}}}*/
 
-/*{{{ clean */
+    /*{{{ clean */
     endwin();
     free(config_file); config_file=NULL;
     free(command); command=NULL;
@@ -210,9 +239,9 @@ int main(int argc, char *argv[]){
     config_destroy(config);
     free(config);
     config=NULL;
+    /*}}}*/
     return 0;
 }
-/*}}}*/
 
 /*{{{ function usage*/
 void usage(){
@@ -234,10 +263,6 @@ void usage(){
     printf("   'Enter': connect\n");
     printf("   'q': quit\n");
 }/*}}}*/
-
-int get_current_page(int current_row, int hosts_perpage) {
-    return (current_row+1)/hosts_perpage;
-}
 
 /*{{{ function login */
 void login(host *h, char *command){
@@ -272,4 +297,5 @@ int get_match_row(conf_set *confs,
             break;
         }
     return current_row;
-}/*}}}*/
+}
+/*}}}*/
