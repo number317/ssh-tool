@@ -15,7 +15,7 @@ debug: $(GCNO_OBJ)
 	$(CC) $(OBJ) $(CFLAGS) $(CGOV) -o $(TARGET)
 
 $(GCNO_OBJ):%.gcno:%.c
-	$(CC) $^ $(CGOV) -c
+	$(CC) $^ $(CGOV) $(CFLAGS) -c
 
 .PHONY: clean
 clean:
