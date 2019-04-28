@@ -1,6 +1,8 @@
 .idea/
 *.iml
 *.out
-nbproject/
+*.o
 ssh-tool
-main
+*.gcno
+*.gcda
+*.gcov

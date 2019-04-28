@@ -115,6 +115,7 @@ int main(int argc, char *argv[]){
             /*}}}*/
             /*{{{ search keywords */
             case '/':
+                current_page = current_row/confs->hosts_perpage;
                 mvprintw(status_line, 0, "%c", operator);
                 show(confs, current_row, show_password, current_page);
                 mvgetstr(status_line, 1, command);
