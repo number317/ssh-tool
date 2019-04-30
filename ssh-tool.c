@@ -242,7 +242,7 @@ int page_up_down(conf_set *confs, int current_row, char direction){
 /*{{{ function login */
 void login(host *h, char *command){
     if(strcmp(h->use_key, "false")==0)
-        snprintf(command, 100, "sshpass -p %s ssh %s@%s -p %s",
+        snprintf(command, 100, "sshpass -p \"%s\" ssh %s@%s -p %s",
                 h->password,
                 h->username,
                 h->ip,
