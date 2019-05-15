@@ -241,19 +241,19 @@ int page_up_down(conf_set *confs, int current_row, char direction){
 
 /*{{{ function login */
 void login(host *h, char *command){
-    if(strcmp(h->use_key, "false")==0)
-        snprintf(command, 100, "sshpass -p \"%s\" ssh %s@%s -p %s",
-                h->password,
-                h->username,
-                h->ip,
-                h->port);
-    else
+    if(strcmp(h->use_key, "true")==0)
         snprintf(command, 100, "ssh -i %s %s@%s -p %s",
                 h->password,
                 h->username,
                 h->ip,
                 h->port);
-    printf("connect to %s(%s)...\n",
+    else
+        snprintf(command, 100, "sshpass -p '%s' ssh %s@%s -p %s",
+                h->password,
+                h->username,
+                h->ip,
+                h->port);
+    printf("connect to %s(%s) ...\n",
             h->hostname,
             h->ip);
     system(command);
