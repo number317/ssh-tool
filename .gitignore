@@ -6,3 +6,5 @@ ssh-tool
 *.gcno
 *.gcda
 *.gcov
+AppDir/
+*.AppImage

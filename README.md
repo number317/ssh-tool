@@ -5,13 +5,43 @@
 
 This is a small tool to manage ssh server info in command line. Write the servers' info down in the config file so that you don't need to remember the servers' ip, password or port.
 
-# Dependency
+# Install
 
 * libconfig: parse cfg
 * ncurse: draw gui
 * sshpass: take password form config file
 
-# shortcut
+* for archlinux:
+
+  ```
+  pacman -S libconfig ncurse sshpass
+  make
+  ```
+
+* for centos:
+
+  ```
+  yum install -y libconfig-devel ncurses-devel sshpass
+  make
+  ```
+
+* for debian:
+
+  ```
+  apt install -y libncurses5-dev libconfig-dev sshpass
+  make
+  ```
+
+* for mac:
+
+  ```
+  brew install libconfig ncurses
+  brew install https://raw.github.com/eugeneoden/homebrew/eca9de1/Library/Formula/sshpass.rb
+  sed -i "s/ncursesw/ncurses/g" Makefile
+  make
+  ```
+
+# Shortcut
 
 * <kbd>e</kbd>: edit config with `$EDITOR`
 * <kbd>j</kbd>: move down
@@ -30,7 +60,7 @@ This is a small tool to manage ssh server info in command line. Write the server
 * <kbd>q</kbd>: exit
 * <kbd>Enter</kbd>: connect
 
-# config
+# Config
 
 The default config file is in `$HOME/.config/ssh-tool/hosts.cfg`, you can also change the file path by `ssh-tool /path/to/config_file`.
 
