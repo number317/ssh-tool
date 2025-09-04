@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <math.h>
 #include <string.h>
 #include <locale.h>
 #include <ncurses.h>
@@ -9,6 +8,8 @@
 #include "draw/draw.h"
 #include "utility/utility.h"
 #include "ssh-tool.h"
+
+#define COMMAND_LENGTH 110
 
 int main(int argc, char *argv[]){
     /*{{{ args handler */
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]){
 
     /*{{{ keyboard event */
     char operator;
-    char *command = (char*)calloc(100, sizeof(char));
+    char *command = (char*)calloc(COMMAND_LENGTH, sizeof(char));
     while((operator=getchar())!='q')
     {
         switch(operator)
@@ -83,7 +84,7 @@ int main(int argc, char *argv[]){
                     getchar();
                 }
                 else {
-                    snprintf(command, 100, "%s %s",
+                    snprintf(command, COMMAND_LENGTH, "%s %s",
                             getenv("EDITOR"), config_file);
                     system(command);
                     clean_hosts_content(confs->hosts, confs->hosts_length);
@@ -242,13 +243,13 @@ int page_up_down(conf_set *confs, int current_row, char direction){
 /*{{{ function login */
 void login(host *h, char *command){
     if(strcmp(h->use_key, "true")==0)
-        snprintf(command, 100, "ssh -i %s %s@%s -p %s",
+        snprintf(command, COMMAND_LENGTH, "ssh -o StrictHostKeyChecking=accept-new -i %s %s@%s -p %s",
                 h->password,
                 h->username,
                 h->ip,
                 h->port);
     else
-        snprintf(command, 100, "sshpass -p '%s' ssh %s@%s -p %s",
+        snprintf(command, COMMAND_LENGTH, "sshpass -p '%s' ssh -o StrictHostKeyChecking=accept-new %s@%s -p %s",
                 h->password,
                 h->username,
                 h->ip,
