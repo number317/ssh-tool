@@ -1,10 +1,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../utility/utility.h"
 #include "config.h"
+#include "../utility/utility.h"
 
-config_t* set_config_file(config_t *config, char *config_file) {
+config_t *set_config_file(config_t *config, char *config_file) {
     if(! config_read_file(config, config_file)) {
         fprintf(stderr, "%s:%d - %s\n", config_error_file(config),
                 config_error_line(config), config_error_text(config));
@@ -31,7 +31,7 @@ int get_length(config_t *config, char *setting) {
  * header is an array used to save table's header
  * header_length is the length of array header and it should not change
  */
-char** get_header(
+char **get_header(
         config_t *config,
         char **header,
         int header_length) {
@@ -46,7 +46,7 @@ char** get_header(
 /*
  * seperation is a string to save seperation
  */
-char* get_seperation(
+char *get_seperation(
         config_t *config,
         char *seperation,
         int seperation_length) {
@@ -65,7 +65,7 @@ char* get_seperation(
     return new_seperation;
 }
 
-host** get_hosts(
+host **get_hosts(
         config_t *config,
         host **hosts,
         int hosts_length) {
@@ -75,7 +75,7 @@ host** get_hosts(
     host **new_hosts;
     new_hosts = realloc(hosts, hosts_length*sizeof(host*));
     for(int i=0; i<hosts_length; i++) {
-        new_hosts[i] = (host*)malloc(sizeof(host));
+        new_hosts[i] = (host *)calloc(1, sizeof(host));
         config_setting_t *hosts_item = config_setting_get_elem(host_list, i);
         config_setting_lookup_string(hosts_item, "hostname",
                 &(new_hosts[i]->hostname));
@@ -88,10 +88,28 @@ host** get_hosts(
                 &(new_hosts[i]->username));
         config_setting_lookup_string(hosts_item, "password",
                 &(new_hosts[i]->password));
+        config_setting_lookup_string(hosts_item, "proxy_hostname",
+                &(new_hosts[i]->proxy_hostname));
         config_setting_lookup_string(hosts_item, "comment",
                 &(new_hosts[i]->comment));
     }
+    for (int i = 0; i < hosts_length; i++) {
+        if (new_hosts[i]->proxy_hostname != NULL) {
+            new_hosts[i]->proxy_host = get_host_by_hostname(new_hosts, hosts_length, new_hosts[i]->proxy_hostname);
+        }
+    }
     return new_hosts;
+}
+
+host *get_host_by_hostname(host **hosts, int hosts_length, const char *hostname) {
+    host *result = NULL;
+    for(int i=0; i<hosts_length; i++) {
+        if(!strcmp(hosts[i]->hostname, hostname)) {
+            result = hosts[i];
+            break;
+        }
+    }
+    return result;
 }
 
 void clean_hosts_content(host **hosts, int hosts_length) {
@@ -99,7 +117,7 @@ void clean_hosts_content(host **hosts, int hosts_length) {
         free(hosts[i]);
 }
 
-conf_set* get_conf_set(config_t **config, char *config_file, conf_set *confs) {
+conf_set *get_conf_set(config_t **config, char *config_file, conf_set *confs) {
     set_config_file(*config, config_file);
 
     confs->header_length = get_length(*config, "header");

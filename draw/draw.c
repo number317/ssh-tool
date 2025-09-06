@@ -1,8 +1,6 @@
 #include <ncurses.h>
-#include <string.h>
-#include <stdlib.h>
-#include "../utility/utility.h"
 #include "draw.h"
+#include "../utility/utility.h"
 
 void show(conf_set *confs, int current_row, int show_password, int old_page) {
 

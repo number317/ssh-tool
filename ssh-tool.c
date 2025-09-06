@@ -5,11 +5,12 @@
 #include <locale.h>
 #include <ncurses.h>
 #include <libconfig.h>
+#include "config/config.h"
 #include "draw/draw.h"
+#include "host/host.h"
 #include "utility/utility.h"
 #include "ssh-tool.h"
 
-#define COMMAND_LENGTH 110
 
 int main(int argc, char *argv[]){
     /*{{{ args handler */
@@ -69,7 +70,7 @@ int main(int argc, char *argv[]){
 
     /*{{{ keyboard event */
     char operator;
-    char *command = (char*)calloc(COMMAND_LENGTH, sizeof(char));
+    char *command;
     while((operator=getchar())!='q')
     {
         switch(operator)
@@ -84,8 +85,7 @@ int main(int argc, char *argv[]){
                     getchar();
                 }
                 else {
-                    snprintf(command, COMMAND_LENGTH, "%s %s",
-                            getenv("EDITOR"), config_file);
+                    command = build_command("%s %s", getenv("EDITOR"), config_file);
                     system(command);
                     clean_hosts_content(confs->hosts, confs->hosts_length);
                     confs = get_conf_set(&config, config_file, confs);
@@ -242,18 +242,7 @@ int page_up_down(conf_set *confs, int current_row, char direction){
 
 /*{{{ function login */
 void login(host *h, char *command){
-    if(strcmp(h->use_key, "true")==0)
-        snprintf(command, COMMAND_LENGTH, "ssh -o StrictHostKeyChecking=accept-new -i %s %s@%s -p %s",
-                h->password,
-                h->username,
-                h->ip,
-                h->port);
-    else
-        snprintf(command, COMMAND_LENGTH, "sshpass -p '%s' ssh -o StrictHostKeyChecking=accept-new %s@%s -p %s",
-                h->password,
-                h->username,
-                h->ip,
-                h->port);
+    command = get_connect_command(h);
     printf("connect to %s(%s) ...\n",
             h->hostname,
             h->ip);

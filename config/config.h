@@ -4,7 +4,7 @@
 #include "../host/host.h"
 
 // conf_set struct used to wrap arguement
-typedef struct _conf_set {
+typedef struct conf_set_ {
     char **header;
     int header_length;
     char *seperation;
@@ -15,13 +15,14 @@ typedef struct _conf_set {
     int hosts_length;
 } conf_set;
 
-config_t* set_config_file(config_t *, char *);
+config_t *set_config_file(config_t *, char *);
 int get_length(config_t *, char *);
-char** get_header(config_t *, char **, int);
-char* get_seperation(config_t *, char *, int);
-host** get_hosts(config_t*, host **, int);
+char **get_header(config_t *, char **, int);
+char *get_seperation(config_t *, char *, int);
+host **get_hosts(config_t*, host **, int);
+host *get_host_by_hostname(host **, int, const char *);
 void clean_hosts_content(host **, int);
-conf_set* get_conf_set(config_t **, char *, conf_set *);
+conf_set *get_conf_set(config_t **, char *, conf_set *);
 void clean_conf_set(conf_set *);
 void print_conf_set(conf_set *);
 

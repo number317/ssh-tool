@@ -102,6 +102,7 @@ hosts=(
         ip="444.444.444.444";
         port="22";
         use_key="false"
+        proxy_hostname="test1"
         username="root";
         password="admin";
         comment="test4";
@@ -109,9 +110,22 @@ hosts=(
       );
 ```
 
-The config file should have `hostname`, `ip`, `port`, `use_key`, `user`, `password`, `intro` seven part.
+The host config has the following fields.
+
+| field             | description            | required |
+|:------------------|:-----------------------|:---------|
+| `hostname`        | hostname of the server | yes      |
+| `ip`              | ip of the server       | yes      |
+| `port`            | port of the server     | yes      |
+| `use_key`         | use identity file      | no       |
+| `proxy_hostname`  | proxy host name        | no       |
+| `user`            | user of the server     | yes      |
+| `password`        | password of the server | yes      |
+| `intro`           | comment of the server  | no       |
 
 If you use identity file to login in, the `password` should be the path of identity file.
+
+`proxy_hostname` is the hostname of proxy server, if you want to use proxy. So the hostname should be unique in the config file.
 
 # screenshot
 
