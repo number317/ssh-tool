@@ -1,3 +1,4 @@
+#include <libconfig.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,6 +37,7 @@ char **get_header(
         char **header,
         int header_length) {
     config_setting_t *headers;
+    header = realloc(header, header_length*sizeof(char*));
     error_handle(!(headers=config_lookup(config, "header")),
             "Error! Config file doesn't have the header config\n");
     for(int i=0; i<header_length; i++)
@@ -43,9 +45,6 @@ char **get_header(
     return header;
 }
 
-/*
- * seperation is a string to save seperation
- */
 char *get_seperation(
         config_t *config,
         char *seperation,
@@ -72,8 +71,7 @@ host **get_hosts(
     config_setting_t *host_list = config_lookup(config, "hosts");
     error_handle(!host_list,
             "Error! Config file doesn't have the hosts config\n");
-    host **new_hosts;
-    new_hosts = realloc(hosts, hosts_length*sizeof(host*));
+    host **new_hosts = malloc(hosts_length*sizeof(host*));
     for(int i=0; i<hosts_length; i++) {
         new_hosts[i] = (host *)calloc(1, sizeof(host));
         config_setting_t *hosts_item = config_setting_get_elem(host_list, i);
@@ -82,7 +80,7 @@ host **get_hosts(
         config_setting_lookup_string(hosts_item, "ip", &(new_hosts[i]->ip));
         config_setting_lookup_string(hosts_item, "port",
                 &(new_hosts[i]->port));
-        config_setting_lookup_string(hosts_item, "use_key",
+        config_setting_lookup_bool(hosts_item, "use_key",
                 &(new_hosts[i]->use_key));
         config_setting_lookup_string(hosts_item, "username",
                 &(new_hosts[i]->username));
@@ -90,18 +88,22 @@ host **get_hosts(
                 &(new_hosts[i]->password));
         config_setting_lookup_string(hosts_item, "proxy_hostname",
                 &(new_hosts[i]->proxy_hostname));
+        config_setting_lookup_bool(hosts_item, "hidden",
+                &(new_hosts[i]->hidden));
         config_setting_lookup_string(hosts_item, "comment",
                 &(new_hosts[i]->comment));
     }
     for (int i = 0; i < hosts_length; i++) {
         if (new_hosts[i]->proxy_hostname != NULL) {
-            new_hosts[i]->proxy_host = get_host_by_hostname(new_hosts, hosts_length, new_hosts[i]->proxy_hostname);
+            new_hosts[i]->proxy_host = get_host_by_hostname(
+                    new_hosts, hosts_length, new_hosts[i]->proxy_hostname);
         }
     }
     return new_hosts;
 }
 
-host *get_host_by_hostname(host **hosts, int hosts_length, const char *hostname) {
+host *get_host_by_hostname(
+        host **hosts, int hosts_length, const char *hostname) {
     host *result = NULL;
     for(int i=0; i<hosts_length; i++) {
         if(!strcmp(hosts[i]->hostname, hostname)) {
@@ -123,15 +125,31 @@ conf_set *get_conf_set(config_t **config, char *config_file, conf_set *confs) {
     confs->header_length = get_length(*config, "header");
     confs->seperation_length = get_length(*config, "seperation_length");
     confs->hosts_perpage = get_length(*config, "hosts_perpage");
-    confs->pages = confs->hosts_length%confs->hosts_perpage==0?
-        confs->hosts_length/confs->hosts_perpage-1 :
-        confs->hosts_length/confs->hosts_perpage;
-    confs->hosts_length = get_length(*config, "hosts");
 
+    confs->header = malloc(confs->header_length*sizeof(char*));
     confs->header = get_header(*config, confs->header, confs->header_length);
+    confs->seperation = malloc(confs->seperation_length*sizeof(char));
     confs->seperation = get_seperation(*config, confs->seperation,
             confs->seperation_length);
-    confs->hosts = get_hosts(*config, confs->hosts, confs->hosts_length);
+
+    int total_hosts = get_length(*config, "hosts");
+    confs->hosts = get_hosts(*config, confs->hosts, total_hosts);
+    int show_hosts = 0;
+    int left =0, right = 0;
+    while (right < total_hosts) {
+        if (!confs->hosts[right]->hidden) {
+            show_hosts++;
+            host *temp = confs->hosts[left];
+            confs->hosts[left] = confs->hosts[right];
+            confs->hosts[right] = temp;
+            left++;
+        }
+        right++;
+    }
+    confs->hosts_length = show_hosts;
+    confs->pages = show_hosts%confs->hosts_perpage==0?
+        show_hosts/confs->hosts_perpage-1 :
+        show_hosts/confs->hosts_perpage;
     return confs;
 }
 

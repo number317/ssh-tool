@@ -78,6 +78,7 @@ hosts=(
         username="root";
         password="admin";
         comment="test1";
+        proxy_hostname="test3";
         },
         {
         hostname="test2";
@@ -96,6 +97,7 @@ hosts=(
         username="root";
         password="admin";
         comment="test3";
+        hidden="true";
         },
         {
         hostname="test4";
@@ -112,16 +114,17 @@ hosts=(
 
 The host config has the following fields.
 
-| field             | description            | required |
-|:------------------|:-----------------------|:---------|
-| `hostname`        | hostname of the server | yes      |
-| `ip`              | ip of the server       | yes      |
-| `port`            | port of the server     | yes      |
-| `use_key`         | use identity file      | no       |
-| `proxy_hostname`  | proxy host name        | no       |
-| `user`            | user of the server     | yes      |
-| `password`        | password of the server | yes      |
-| `intro`           | comment of the server  | no       |
+| field             | description                     | type   | required |
+|:------------------|:--------------------------------|:-------|:---------|
+| `hostname`        | hostname of the server          | string | yes      |
+| `ip`              | ip of the server                | string | yes      |
+| `port`            | port of the server              | string | yes      |
+| `use_key`         | use identity file               | bool   | no       |
+| `proxy_hostname`  | proxy host name                 | string | no       |
+| `user`            | user of the server              | string | yes      |
+| `password`        | password of the server          | string | yes      |
+| `comment`         | comment of the server           | string | no       |
+| `hidden`          | hide record(use for proxy host) | bool   | no       |
 
 If you use identity file to login in, the `password` should be the path of identity file.
 

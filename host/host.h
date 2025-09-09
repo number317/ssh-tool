@@ -4,11 +4,12 @@ typedef struct host_ {
     const char *hostname;
     const char *ip;
     const char *port;
-    const char *use_key;
+    int use_key;
     const char *username;
     const char *password;
     const char *comment;
     const char *proxy_hostname;
+    int hidden;
     struct host_ *proxy_host;
 } host;
 

@@ -21,6 +21,9 @@ void show(conf_set *confs, int current_row, int show_password, int old_page) {
     int start = current_page*confs->hosts_perpage;
     int end = min(start + confs->hosts_perpage, confs->hosts_length);
     for(int i=start; i<end; i++) {
+        if (confs->hosts[i]->hidden) {
+            continue;
+        }
         if(i==current_row) attron(A_REVERSE);
         printw("%-15.14s%-18.17s%-8.7s%-15.14s",
                 confs->hosts[i]->hostname,

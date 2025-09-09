@@ -42,17 +42,7 @@ int main(int argc, char *argv[]){
 
     config_init(config);
     config = set_config_file(config, config_file);
-
     conf_set *confs = malloc(sizeof(conf_set));
-
-    confs->header_length = get_length(config, "header");
-    confs->seperation_length = get_length(config, "seperation_length");
-    confs->hosts_length = get_length(config, "hosts");
-
-    confs->header = (char**)malloc(sizeof(char*)*confs->header_length);
-    confs->seperation = (char*)malloc(sizeof(char)*confs->seperation_length);
-    confs->hosts = (host**)malloc(sizeof(host*)*confs->hosts_length);
-
     confs = get_conf_set(&config, config_file, confs);
 
     int current_row = 0;
