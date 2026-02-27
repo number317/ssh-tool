@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -60,6 +61,7 @@ int main(int argc, char *argv[]){
 
     /*{{{ keyboard event */
     char operator;
+    char search_pattern[256] = {0};
     char *command;
     while((operator=getchar())!='q')
     {
@@ -109,12 +111,12 @@ int main(int argc, char *argv[]){
                 current_page = current_row/confs->hosts_perpage;
                 mvprintw(status_line, 0, "%c", operator);
                 show(confs, current_row, show_password, current_page);
-                mvgetstr(status_line, 1, command);
+                mvgetstr(status_line, 1, search_pattern);
             case 'n':
             case 'N':
                 current_page = current_row/confs->hosts_perpage;
                 current_row = get_match_row(confs, current_row,
-                        operator=='N' ? -1 : 1, command);
+                        operator=='N' ? -1 : 1, search_pattern);
                 mvprintw(status_line, 0, "%s",
                         "                                        "
                         "                                        ");
@@ -185,7 +187,6 @@ int main(int argc, char *argv[]){
     /*{{{ clean */
     endwin();
     free(config_file); config_file=NULL;
-    free(command); command=NULL;
     clean_conf_set(confs);
     config_destroy(config);
     free(config);
@@ -236,13 +237,18 @@ void login(host *h, char *command){
     printf("connect to %s(%s) ...\n",
             h->hostname,
             h->ip);
+    if (!h->use_key)
+        setenv("SSHPASS", h->password, 1);
     system(command);
+    if (!h->use_key)
+        unsetenv("SSHPASS");
 }
 /*}}}*/
 
 /*{{{ function get_match_row */
 int get_match_row(conf_set *confs,
         int current_row, int direction, char *pattern) {
+    if (pattern[0] == '\0') return current_row;
     for(int i=current_row+direction;
             i<confs->hosts_length && i>0; i=i+direction)
         if(strstr(confs->hosts[i]->hostname, pattern)!=NULL

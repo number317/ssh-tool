@@ -51,7 +51,7 @@ char *get_proxy_command(host *h) {
                 h->ip,
                 h->port);
     else
-        proxy_command = build_command("sshpass -p '%s' ssh -W %%h:%%p %s@%s -p %s",
+        proxy_command = build_command("SSHPASS='%s' sshpass -e ssh -W %%h:%%p %s@%s -p %s",
                 h->password,
                 h->username,
                 h->ip,
@@ -71,8 +71,7 @@ char *get_connect_command(host *h) {
                     h->ip,
                     h->port);
         else
-            command = build_command("sshpass -p '%s' ssh -o StrictHostKeyChecking=accept-new -o ProxyCommand=\"%s\" %s@%s -p %s",
-                    h->password,
+            command = build_command("sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ProxyCommand=\"%s\" %s@%s -p %s",
                     proxy_command,
                     h->username,
                     h->ip,
@@ -86,8 +85,7 @@ char *get_connect_command(host *h) {
                     h->ip,
                     h->port);
         else
-            command = build_command("sshpass -p '%s' ssh -o StrictHostKeyChecking=accept-new %s@%s -p %s",
-                    h->password,
+            command = build_command("sshpass -e ssh -o StrictHostKeyChecking=accept-new %s@%s -p %s",
                     h->username,
                     h->ip,
                     h->port);
